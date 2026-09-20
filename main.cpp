@@ -47,7 +47,9 @@ int main() {
 
     auto maze = converter.translate();
 
-    std::ofstream myFile("C:\\GitHub\\micromouse2026-27\\mazeSim.txt");
+    std::ofstream myFile("mazeSim.txt");
+
+
 
     if (myFile.is_open()) {
         for (int i = 0; i < 33; i++) {
