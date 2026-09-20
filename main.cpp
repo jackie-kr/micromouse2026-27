@@ -1,4 +1,4 @@
-#include <iostream> // Required for std::cout
+#include <iostream>
 #include "arrayTranslator.h"
 #include <array>
 #include <fstream>
