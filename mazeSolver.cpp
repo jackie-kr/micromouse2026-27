@@ -2,20 +2,17 @@
 #include <vector>
 #include <iostream>
 #include "API.h"
-#include "graph.h"
+#include "graphMatrix.h"
+#include "graphList.h"
 
 class MazeSolver {
     private:
         // store the maze in graph form for solving algorithms
-        Graph graph;
+        GraphMatrix graphM{256};
+        GraphList graphL;
 
     public:
-        MazeSolver() {
-            int width = API::mazeWidth();
-            int height = API::mazeHeight();
-
-            graph = Graph(width * height);
-        };
+        MazeSolver() {};
 
         // ENUM for direction placeholder
         enum DIRECTION {
@@ -31,18 +28,38 @@ class MazeSolver {
                 size_t horz_size = horz.size();
 
                 // loop over each node of the graph and check for walls
-                for (int x = 0; x < 16 * 16; x++) {
-                    for (int y = 0; y < 16 * 16; y++) {
+                for (int y = 0; y < 16; y++) {
+                    for (int x = 0; x < 16; x++) {
                         // only need to check to the bottom and the right
                         // because of bi-directional graphs
 
-                        if (y != 15) {
-                            if (vert[x][y + 1] == 0) {
-                                graph.add_edge(x, y);
+                        // if not at the rightmost edge
+                        if (x != 15) {
+                            if (vert[y][x + 1] == 0) {
+                                // std::cout << "Adding edge between: (" << x << ", " << y << ") and (" << x << ", " << y+1 << ")." << std::endl;
+                                // graphM.add_edge(x + (y * 16), (x + (y * 16)) + 1);
+                                graphL.add_edge(x + (y * 16), (x + (y * 16)) + 1);
                             }
                         }
+
+                        // if not at the bottom edge
+                        if (y != 15) {
+                            if (horz[y + 1][x] == 0) {
+                                // std::cout << "Adding edge between: (" << x << ", " << y << ") and (" << x << ", " << y+1 << ")." << std::endl;
+                                // graphM.add_edge(x + (y * 16), (x + (y * 16)) + 1);
+                                graphL.add_edge(x + (y * 16), (x + ((y + 1) * 16)));
+                            }
+                        }
+
+                        // check for proper coordinate mess
+                        std::cout << "Coordinate: (" << x << ", " << y << "), node: " << x + (y * 16) << std::endl;
                     }
                 }
+            }
+
+            void print() {
+                // graphM.print();
+                graphL.print();
             }
 
         // std::vector<DIRECTION> solveDFS() {
@@ -52,44 +69,6 @@ class MazeSolver {
 
 int main() {
     MazeSolver solver;
-
-    // std::array<std::array<int, 16>, 17> horz {{
-    //     {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-    //     {0,1,1,0,0,0,1,1,1,1,1,0,1,0,0,1},
-    //     {0,1,1,0,0,0,1,1,1,1,1,0,1,0,0,1},
-    //     {0,1,1,0,0,0,1,1,1,1,1,0,1,0,0,1},
-    //     {0,1,1,0,0,0,1,1,1,1,1,0,1,0,0,1},
-    //     {0,1,1,0,0,0,1,1,1,1,1,0,1,0,0,1},
-    //     {0,1,1,0,0,0,1,1,1,1,1,0,1,0,0,1},
-    //     {0,1,1,0,0,0,1,1,1,1,1,0,1,0,0,1},
-    //     {0,1,1,0,0,0,1,1,1,1,1,0,1,0,0,1},
-    //     {0,1,1,0,0,0,1,1,1,1,1,0,1,0,0,1},
-    //     {0,1,1,0,0,0,1,1,1,1,1,0,1,0,0,1},
-    //     {0,1,1,0,0,0,1,1,1,1,1,0,1,0,0,1},
-    //     {0,1,1,0,0,0,1,1,1,1,1,0,1,0,0,1},
-    //     {0,1,1,0,0,0,1,1,1,1,1,0,1,0,0,1},
-    //     {0,1,1,0,0,0,1,1,1,1,1,0,1,0,0,1},
-    //     {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-    //     {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-    // }};
-    // std::array<std::array<int, 17>, 16> vert {{
-    //     {h,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1},
-    //     {1,1,1,0,0,0,1,1,1,1,1,0,1,0,1,1,1},
-    //     {1,1,1,0,0,0,1,1,1,1,1,0,1,0,1,1,1},
-    //     {1,1,1,0,0,0,1,1,1,1,1,0,1,0,1,1,1},
-    //     {1,1,1,0,0,0,1,1,1,1,1,0,1,0,1,1,1},
-    //     {1,1,1,0,0,0,1,1,1,1,1,0,1,0,1,1,1},
-    //     {1,0,1,0,0,0,1,1,1,1,1,0,1,0,1,1,1},
-    //     {1,0,0,0,0,0,1,1,1,1,1,0,1,0,1,1,1},
-    //     {1,0,0,0,0,0,1,1,1,1,1,0,1,0,1,1,1},
-    //     {1,1,1,0,0,0,1,1,1,1,1,0,1,0,1,1,1},
-    //     {1,1,1,0,0,0,1,1,1,1,1,0,1,0,1,1,1},
-    //     {1,1,1,0,0,0,1,1,1,1,1,0,1,0,1,1,1},
-    //     {1,1,1,0,0,0,1,1,1,1,1,0,1,0,1,1,1},
-    //     {1,1,1,0,0,0,1,1,1,1,1,0,1,0,1,1,1},
-    //     {1,1,1,0,0,0,1,1,1,1,1,0,1,1,0,1,1},
-    //     {1,1,1,0,0,0,1,1,1,1,1,0,1,1,0,1,1}
-    // }};
 
     std::array<std::array<int, 16>, 17> horz {{
         {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
@@ -131,5 +110,5 @@ int main() {
     }};
 
     solver.createGraph(horz, vert);
-    graph.print();
+    solver.print();
 }

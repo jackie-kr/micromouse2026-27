@@ -3,13 +3,13 @@
 #include <vector>
 using namespace std;
 
-class Graph {
+class GraphMatrix {
     // Adjacency matrix to store graph edges
     vector<vector<int> > adj_matrix;
 
 public:
     // Constructor to initialize the graph with 'n' vertices
-    Graph(int n)
+    GraphMatrix(int n)
     {
         adj_matrix
             = vector<vector<int> >(n, vector<int>(n, 0));
