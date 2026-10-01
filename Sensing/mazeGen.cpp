@@ -2,6 +2,7 @@
 #include "arrayTranslator.h"
 #include <array>
 #include <fstream>
+#include <filesystem>
 
 int main() {
     std::array<std::array<int, 16>, 17> horz {{
@@ -42,7 +43,7 @@ int main() {
         {1,1,1,0,0,0,1,1,1,1,1,0,1,1,0,1,1}
     }};
 
-    std::array<std::array<int, 16>, 17> horz1 {{
+    std::array<std::array<int, 16>, 17> horzSensor {{
         {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
@@ -62,7 +63,7 @@ int main() {
         {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
     }};
 
-    std::array<std::array<int, 17>, 16> vert1 {{
+    std::array<std::array<int, 17>, 16> vertSensor {{
         {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
         {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
         {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
@@ -82,11 +83,15 @@ int main() {
     }};
 
 
-    arrayTranslator converter(horz1, vert1);
+    arrayTranslator converter(horzSensor, vertSensor);
 
     auto maze = converter.translate();
 
-    std::ofstream myFile("../build/mazeSim.txt");
+    std::filesystem::path outputPath = "../build/mazeSim.txt";
+
+    std::filesystem::create_directories(outputPath.parent_path());
+
+    std::ofstream myFile(outputPath);
 
 
 
