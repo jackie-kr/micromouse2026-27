@@ -86,7 +86,7 @@ int main() {
 
     auto maze = converter.translate();
 
-    std::ofstream myFile("mazeSim.txt");
+    std::ofstream myFile("../build/mazeSim.txt");
 
 
 
