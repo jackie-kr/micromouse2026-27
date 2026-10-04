@@ -1,6 +1,7 @@
 #include <array>
 #include <vector>
 #include <iostream>
+#include <queue>
 #include "API.h"
 #include "graphMatrix.h"
 #include "graphList.h"
@@ -57,14 +58,43 @@ class MazeSolver {
                 }
             }
 
-            void print() {
-                // graphM.print();
-                graphL.print();
+        void print() {
+            // graphM.print();
+            graphL.print();
+        }
+
+        bool foundCenter(int vert) {
+            int x = vert % 16;
+            int y = vert / 16;
+            return (x == 7 || x == 8) && (y == 7 || y == 8);
+        }
+
+        vector<DIRECTION> findCenterBFS() {
+            unordered_map<int, vector<int>>& adjList = graphL.getList();
+            vector<unsigned int> seen(adjList.size(), false);
+            vector<int> parent(adjList.size(), -1);
+            queue<int> q;
+            seen[0] = true;
+            q.push(0);
+            while (!q.empty()) {
+                int current = q.front();
+                q.pop();
+                if (foundCenter(current)) {
+                    return constructPath(parent);
+                }
+                for (const auto& neighbor : adjList.at(current)) {
+                    if (!seen[neighbor]) {
+                        seen[neighbor] = true;
+                        parent[neighbor] = current;
+                        q.push(neighbor);
+                    }
+                }
             }
+        }
 
-        // std::vector<DIRECTION> solveDFS() {
-
-        // }
+        vector<DIRECTION> constructPath(vector<int>& parent) {
+            
+        }
 };
 
 int main() {

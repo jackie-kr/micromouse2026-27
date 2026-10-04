@@ -1,14 +1,18 @@
 // C++ Program to Implement a Graph Using Adjacency List
 #include <iostream>
 #include <list>
-#include <map>
+#include <unordered_map>
 using namespace std;
 
 class GraphList {
-    map<int, list<int> >
+    unordered_map<int, vector<int> >
         adjList; // Adjacency list to store the graph
 
 public:
+    unordered_map<int, vector<int>>& getList() {
+        return adjList;
+    }
+
     // Function to add an edge between vertices u and v of
     // the graph
     void add_edge(int u, int v)
@@ -22,7 +26,7 @@ public:
 
     // Function to print the adjacency list representation
     // of the graph
-    void print()
+    void print() const
     {
         cout << "Adjacency list for the Graph: " << endl;
         // Iterate over each vertex
