@@ -1,0 +1,22 @@
+ALCO AS2D Switch
+
+This is a 6 pin ON-ON Slide Switch for through-hole PCB mounting
+
+Contact Rating: 50mA at 48V AC/DC
+
+Pin Setup---------------------------------------------------------
+The Pin setup looking at the side with text left to right is 1,2,3
+Opposite side left to right is 6,5,4
+
+The switch will take input through pin 2 or 5 and then output to the active pin on the corresponding side
+The two sides are separate, meaning each side requires its own power input, but both sides can be used at the same time
+
+Switch Position---------------
+switch towards 1, pins 1 and 4  
+switch towards 3, pins 3 and 6
+
+Switch variations list----------------------------------
+https://www.nidec-components.com/e/catalog/switch/as.pdf
+
+-The AS2D switch only has positions for both sides being either on or off
+-The AS1D switch specifically has a built in middle position that functions as a fully off mode
