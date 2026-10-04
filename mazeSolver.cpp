@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <queue>
+#include <algorithm>
 #include "API.h"
 #include "graphMatrix.h"
 #include "graphList.h"
@@ -63,13 +64,20 @@ class MazeSolver {
             graphL.print();
         }
 
-        bool foundCenter(int vert) {
-            int x = vert % 16;
-            int y = vert / 16;
-            return (x == 7 || x == 8) && (y == 7 || y == 8);
+        // convert a vertex to coordinates (x, y)
+        pair<int, int> convertVertToCoords(int vert) {
+            return {vert % 16, vert / 16};
         }
 
+        // checks if the current vert is in the center (goal)
+        bool foundCenter(int vert) {
+            auto coords = convertVertToCoords(vert);
+            return (coords.first == 7 || coords.first == 8) && (coords.second == 7 || coords.second == 8);
+        }
+
+        // uses BFS to find shortest path to center
         vector<DIRECTION> findCenterBFS() {
+            // setup needed ds, parent is used to reconstruct path
             unordered_map<int, vector<int>>& adjList = graphL.getList();
             vector<unsigned int> seen(adjList.size(), false);
             vector<int> parent(adjList.size(), -1);
@@ -79,8 +87,9 @@ class MazeSolver {
             while (!q.empty()) {
                 int current = q.front();
                 q.pop();
+                // end early if found the center
                 if (foundCenter(current)) {
-                    return constructPath(parent);
+                    return constructPath(parent, current);
                 }
                 for (const auto& neighbor : adjList.at(current)) {
                     if (!seen[neighbor]) {
@@ -92,8 +101,18 @@ class MazeSolver {
             }
         }
 
-        vector<DIRECTION> constructPath(vector<int>& parent) {
-            
+        // reconstruct path from parent and find the directions from 0
+        vector<DIRECTION> constructPath(vector<int>& parent, int start) {
+            vector<int> path;
+            vector<DIRECTION> directions;
+            for (int current = start; current >= 0; current = parent[current])
+                path.push_back(current);
+            reverse(path.begin(), path.end());
+            for (const auto& vert : path) {
+                // TODO: convert vert path to directions from start (vert = 0)
+                
+            }
+            return directions;
         }
 };
 
