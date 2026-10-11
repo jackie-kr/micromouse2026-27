@@ -5,3 +5,6 @@
 *.xml
 *.xml
 mazeSim.txt
+# ignore all compiled files and algorithms
+*.exe
+*.out
