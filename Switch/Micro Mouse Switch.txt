@@ -20,3 +20,7 @@ https://www.nidec-components.com/e/catalog/switch/as.pdf
 
 -The AS2D switch only has positions for both sides being either on or off
 -The AS1D switch specifically has a built in middle position that functions as a fully off mode
+
+THE SWITCH WE FOUND AND CHOOSE
+-Can be bought off of Mouser.com, Mouser part # - 706-48ASSP3S1M2RBT
+3 pins, One-OFF-On roughly 3x8 mm model SSP3
