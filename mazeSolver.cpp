@@ -18,14 +18,14 @@ class MazeSolver {
 
         // ENUM for direction placeholder
         enum DIRECTION {
-            UP = 0b0100,
-            UP_RIGHT = 0b0101,
-            RIGHT = 0b0001,
-            DOWN_RIGHT = 0b1101,
-            DOWN = 0b1100,
-            DOWN_LEFT = 0b1111,
-            LEFT = 0b0011,
-            UP_LEFT = 0b0111
+            UP = 0b0100, // 4
+            UP_RIGHT = 0b0101, // 5
+            RIGHT = 0b0001, // 1
+            DOWN_RIGHT = 0b1101, // 13
+            DOWN = 0b1100, // 12
+            DOWN_LEFT = 0b1111, // 15
+            LEFT = 0b0011, // 3
+            UP_LEFT = 0b0111 // 7
         };
 
         void createGraph(std::array<std::array<int, 16>, 17> horz,
@@ -58,7 +58,7 @@ class MazeSolver {
                         }
 
                         // check for proper coordinate mess
-                        std::cout << "Coordinate: (" << x << ", " << y << "), node: " << x + (y * 16) << std::endl;
+                        // std::cout << "Coordinate: (" << x << ", " << y << "), node: " << x + (y * 16) << std::endl;
                     }
                 }
             }
@@ -109,6 +109,7 @@ class MazeSolver {
                     }
                 }
             }
+            return constructPath(parent, 0); // wasn't found
         }
 
         // reconstruct path from parent and find the directions from 0
@@ -121,7 +122,7 @@ class MazeSolver {
             pair<int, int> prevCoords = {0, 0};
             for (int i = 1; i < path.size(); i++) {
                 pair<int, int> coords = convertVertToCoords(path.at(i));
-                directions.push_back(getDirFromOffset(prevCoords.first - coords.first, prevCoords.second - coords.second));
+                directions.push_back(getDirFromOffset(coords.first - prevCoords.first, coords.second - prevCoords.second));
                 prevCoords = coords;
             }
             return directions;
@@ -171,5 +172,9 @@ int main() {
     }};
 
     solver.createGraph(horz, vert);
-    solver.print();
+    // solver.print();
+    vector<MazeSolver::DIRECTION> dirPath = solver.findCenterBFS();
+    for (const auto& dir : dirPath) {
+        cout << dir << '\n';
+    }
 }
