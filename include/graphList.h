@@ -1,4 +1,5 @@
 // C++ Program to Implement a Graph Using Adjacency List
+#pragma once
 #include <iostream>
 #include <list>
 #include <unordered_map>

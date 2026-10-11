@@ -3,9 +3,9 @@
 #include <iostream>
 #include <queue>
 #include <algorithm>
-#include "API.h"
-#include "graphMatrix.h"
-#include "graphList.h"
+#include "include/API.h"
+#include "include/graphMatrix.h"
+#include "include/graphList.h"
 
 class MazeSolver {
     private:

@@ -1,5 +1,6 @@
+#pragma once
 #include <array>
-#include "API.h"
+#include "../include/API.h"
 
 class MazeMapper {
     private:

@@ -1,4 +1,5 @@
 // C++ Program to Implement a Graph Using Adjacency Matrix
+#pragma once
 #include <iostream>
 #include <vector>
 using namespace std;

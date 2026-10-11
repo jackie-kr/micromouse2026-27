@@ -1,11 +1,9 @@
 #include <iostream>
 #include <string>
 #include <cmath>
-#include "arrayTranslator.h"
-#include "mazeMapper.h"
-
-#include "API.h"
-
+#include "include/API.h"
+#include "Sensing/arrayTranslator.h"
+#include "Sensing/mazeMapper.h"
 
 //x, y
 std::array<int, 2> curPosition {0, 0};
