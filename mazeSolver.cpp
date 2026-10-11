@@ -18,10 +18,14 @@ class MazeSolver {
 
         // ENUM for direction placeholder
         enum DIRECTION {
-            UP,
-            DOWN,
-            LEFT,
-            RIGHT
+            UP = 0b0100,
+            UP_RIGHT = 0b0101,
+            RIGHT = 0b0001,
+            DOWN_RIGHT = 0b1101,
+            DOWN = 0b1100,
+            DOWN_LEFT = 0b1111,
+            LEFT = 0b0011,
+            UP_LEFT = 0b0111
         };
 
         void createGraph(std::array<std::array<int, 16>, 17> horz,
@@ -69,6 +73,12 @@ class MazeSolver {
             return {vert % 16, vert / 16};
         }
 
+        // get a direction to travel given a change in position
+        DIRECTION getDirFromOffset(int dx, int dy) {
+            // convert 2 ints to 1 using its bits (corresponding directions are already set up correctly)
+            return (DIRECTION) ((dx & 0b11) | (((dy) & 0b11) << 2));
+        }
+
         // checks if the current vert is in the center (goal)
         bool foundCenter(int vert) {
             auto coords = convertVertToCoords(vert);
@@ -108,9 +118,11 @@ class MazeSolver {
             for (int current = start; current >= 0; current = parent[current])
                 path.push_back(current);
             reverse(path.begin(), path.end());
-            for (const auto& vert : path) {
-                // TODO: convert vert path to directions from start (vert = 0)
-                
+            pair<int, int> prevCoords = {0, 0};
+            for (int i = 1; i < path.size(); i++) {
+                pair<int, int> coords = convertVertToCoords(path.at(i));
+                directions.push_back(getDirFromOffset(prevCoords.first - coords.first, prevCoords.second - coords.second));
+                prevCoords = coords;
             }
             return directions;
         }
