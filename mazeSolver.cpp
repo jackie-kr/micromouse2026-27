@@ -3,20 +3,20 @@
 #include <iostream>
 #include <queue>
 #include <algorithm>
+#include "Sensing/mazeMapper.h"
 #include "include/API.h"
-#include "include/graphMatrix.h"
 #include "include/graphList.h"
 
 class MazeSolver {
     private:
         // store the maze in graph form for solving algorithms
-        GraphMatrix graphM{256};
         GraphList graphL;
 
     public:
         MazeSolver() {};
 
         // ENUM for direction placeholder
+        // Who chose this placeholder values?? why is there no consistent pattern?
         enum DIRECTION {
             UP = 0b0100, // 4
             UP_RIGHT = 0b0101, // 5
@@ -141,49 +141,111 @@ class MazeSolver {
 int main() {
     MazeSolver solver;
 
-    std::array<std::array<int, 16>, 17> horzSensor {{
-        {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0},
-        {0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,1,0,0,0,1,1,1,1,1,0,0,0,0},
-        {0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-        {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0},
-        {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+    std::array<std::array<int, 16>, 17> horzSensor = {{
+        {{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}},
+        {{0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1}},
+        {{1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0}},
+        {{1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1}},
+        {{0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1}},
+        {{0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0}},
+        {{0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1}},
+        {{1, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1}},
+        {{1, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0}},
+        {{0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0}},
+        {{1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0}},
+        {{1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1}},
+        {{0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1}},
+        {{0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0}},
+        {{1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1}},
+        {{0, 1, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0}},
+        {{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}},
     }};
 
-    std::array<std::array<int, 17>, 16> vertSensor {{
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,1,0,1,1,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,1,0,0,0,1,1,1,0,0,1},
-        {1,0,1,0,0,0,0,1,0,0,0,1,0,0,0,0,1},
-        {1,0,1,0,0,0,0,1,0,0,0,1,0,0,0,0,1},
-        {1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,1,0,1,0,0,0,0,0,0,0,0,1,0,0,1},
-        {1,0,1,0,1,0,0,0,0,0,0,0,0,1,0,0,1},
-        {1,0,1,0,1,0,0,0,0,0,0,0,0,1,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}
+    std::array<std::array<int, 17>, 16> vertSensor = {{
+        {{1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1}},
+        {{1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1}},
+        {{1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1}},
+        {{1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 1}},
+        {{1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1}},
+        {{1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1}},
+        {{1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1}},
+        {{1, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1}},
+        {{1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 1}},
+        {{1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1}},
+        {{1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1}},
+        {{1, 0, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1}},
+        {{1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1}},
+        {{1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1}},
+        {{1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1}},
+        {{1, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1}},
     }};
 
     solver.createGraph(horzSensor, vertSensor);
     // solver.print();
     vector<MazeSolver::DIRECTION> dirPath = solver.findCenterBFS();
+
+    // Move the mouse to follow the path found by BFS
+    // 0 = up
+    // 1 = left
+    // 2 = down
+    // 3 = right
+    int orientation = 0; // starting facing up {
+
+    cerr << "Starting to solve the maze" << std::endl;
+
     for (const auto& dir : dirPath) {
         cerr << dir << '\n';
+        int actual_dir = 0;
+        // map enum to compass directoin
+        switch (dir) {
+            case MazeSolver::UP:
+                actual_dir = 0;
+                break;
+            case MazeSolver::LEFT:
+                actual_dir = 1;
+                break;
+            case MazeSolver::DOWN:
+                actual_dir = 2;
+                break;
+            case MazeSolver::RIGHT:
+                actual_dir = 3;
+                break;
+            default:
+                actual_dir = 0;
+        }
+
+        // check if we need to turn at all
+        if (actual_dir != orientation) {
+            cerr << "We need to turn!" << endl;
+
+            if (actual_dir == (orientation + 1) % 4) {
+                // we need to turn left
+                API::turnLeft();
+                orientation++;
+            }
+
+            if (actual_dir == (orientation + 3) % 4) {
+                // Turn right
+                API::turnRight();
+                orientation--;
+            }
+
+            if  (orientation < 0) {
+                orientation = 3;
+            }
+
+            if  (orientation > 3) {
+                orientation = 0;
+            }
+        }
+
+        if (!API::wallFront()) {
+            API::moveForward(1); // move forward one cell
+        } else {
+            cerr << "Hey we're gonna hit a wall qwq" << endl;
+        }
     }
+
+
+
 }
