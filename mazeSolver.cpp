@@ -34,31 +34,31 @@ class MazeSolver {
                 size_t horz_size = horz.size();
 
                 // loop over each node of the graph and check for walls
+                // Start at bottom left corner (0, 0) and go to top right corner (15, 15)
+                // Based on coordinates used by mms
                 for (int y = 0; y < 16; y++) {
                     for (int x = 0; x < 16; x++) {
-                        // only need to check to the bottom and the right
+                        // only need to check up and the right
                         // because of bi-directional graphs
 
-                        // if not at the rightmost edge
-                        if (x != 15) {
-                            if (vert[y][x + 1] == 0) {
-                                // std::cout << "Adding edge between: (" << x << ", " << y << ") and (" << x << ", " << y+1 << ")." << std::endl;
-                                // graphM.add_edge(x + (y * 16), (x + (y * 16)) + 1);
-                                graphL.add_edge(x + (y * 16), (x + (y * 16)) + 1);
-                            }
+                        // check for wall to the right
+                        if (x < 15 && vert[15 - y][x + 1] == 0) {
+                            graphL.add_edge(x + (y * 16), (x + 1) + (y * 16));
+                            // cerr << "No vertical wall between " << x + (y * 16) << " and " << (x + 1) + (y * 16) << std::endl;
+                        } else if (x < 15 && vert[15 - y][x + 1] == 1) {
+                            // cerr << "Vertical wall between " << x + (y * 16) << " and " << (x + 1) + (y * 16) << std::endl;
                         }
 
-                        // if not at the bottom edge
-                        if (y != 15) {
-                            if (horz[y + 1][x] == 0) {
-                                // std::cout << "Adding edge between: (" << x << ", " << y << ") and (" << x << ", " << y+1 << ")." << std::endl;
-                                // graphM.add_edge(x + (y * 16), (x + (y * 16)) + 1);
-                                graphL.add_edge(x + (y * 16), (x + ((y + 1) * 16)));
-                            }
+                        // check for wall above
+                        if (y < 15 && horz[15 - y][x] == 0) {
+                            graphL.add_edge(x + (y * 16), x + ((y + 1) * 16));
+                            cerr << "No horizontal wall between " << x + (y * 16) << " and " << x + ((y + 1) * 16) << std::endl;
+                        } else if (y < 15 && horz[15 - y][x] == 1) {
+                            cerr << "Horizontal wall between " << x + (y * 16) << " and " << x + ((y + 1) * 16) << std::endl;
                         }
 
-                        // check for proper coordinate mess
-                        // std::cout << "Coordinate: (" << x << ", " << y << "), node: " << x + (y * 16) << std::endl;
+                        // Label the nodes with their coordinates for debugging
+                        API::setText(x, y, std::to_string(x + (y * 16)));
                     }
                 }
             }
@@ -92,8 +92,12 @@ class MazeSolver {
             vector<unsigned int> seen(adjList.size(), false);
             vector<int> parent(adjList.size(), -1);
             queue<int> q;
+
+            // start BFS from 0
             seen[0] = true;
             q.push(0);
+
+            // BFS loop
             while (!q.empty()) {
                 int current = q.front();
                 q.pop();
@@ -101,7 +105,9 @@ class MazeSolver {
                 if (foundCenter(current)) {
                     return constructPath(parent, current);
                 }
+                // iterate over neighbors of current node
                 for (const auto& neighbor : adjList.at(current)) {
+                    // cerr << "Current: " << current << ", Neighbor: " << neighbor << std::endl;
                     if (!seen[neighbor]) {
                         seen[neighbor] = true;
                         parent[neighbor] = current;
@@ -109,6 +115,8 @@ class MazeSolver {
                     }
                 }
             }
+
+            // if we reach here, the center wasn't found, return path to 0
             return constructPath(parent, 0); // wasn't found
         }
 
@@ -122,6 +130,7 @@ class MazeSolver {
             pair<int, int> prevCoords = {0, 0};
             for (int i = 1; i < path.size(); i++) {
                 pair<int, int> coords = convertVertToCoords(path.at(i));
+                API::setColor(coords.first, coords.second, 'r');
                 directions.push_back(getDirFromOffset(coords.first - prevCoords.first, coords.second - prevCoords.second));
                 prevCoords = coords;
             }
@@ -132,49 +141,49 @@ class MazeSolver {
 int main() {
     MazeSolver solver;
 
-    std::array<std::array<int, 16>, 17> horz {{
+    std::array<std::array<int, 16>, 17> horzSensor {{
         {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0},
+        {0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,1,0,0,0,1,1,1,1,1,0,0,0,0},
+        {0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+        {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0},
         {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
     }};
 
-    std::array<std::array<int, 17>, 16> vert {{
+    std::array<std::array<int, 17>, 16> vertSensor {{
         {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
         {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
         {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
         {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,0,0,0,1,0,1,1,0,0,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,1,0,0,0,1,1,1,0,0,1},
+        {1,0,1,0,0,0,0,1,0,0,0,1,0,0,0,0,1},
+        {1,0,1,0,0,0,0,1,0,0,0,1,0,0,0,0,1},
+        {1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+        {1,0,1,0,1,0,0,0,0,0,0,0,0,1,0,0,1},
+        {1,0,1,0,1,0,0,0,0,0,0,0,0,1,0,0,1},
+        {1,0,1,0,1,0,0,0,0,0,0,0,0,1,0,0,1},
         {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
         {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}
     }};
 
-    solver.createGraph(horz, vert);
+    solver.createGraph(horzSensor, vertSensor);
     // solver.print();
     vector<MazeSolver::DIRECTION> dirPath = solver.findCenterBFS();
     for (const auto& dir : dirPath) {
-        cout << dir << '\n';
+        cerr << dir << '\n';
     }
 }

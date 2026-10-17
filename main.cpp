@@ -20,7 +20,7 @@ int rotation = 0;
 bool inCenter = false;
 
 void log(const std::string& text) {
-    std::cerr << text << std::endl;
+    std::cout << text << std::endl;
 }
 
 int main(int argc, char* argv[]) {
@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
         }
 
         API::moveForward(1);
-        
+
         switch (rotation)
         {
             case 0: // up
@@ -77,7 +77,7 @@ int main(int argc, char* argv[]) {
         posResult += ">";
 
         // Flipping the arrays to make them readable for the translator.
-        // TODO: 
+        // TODO:
         std::array<std::array<int, 16>, 17> flippedHorz;
         int horzSize = sizeof(flippedHorz) / sizeof(flippedHorz[0]);
         for (int i = 0; i < horzSize; ++i) {

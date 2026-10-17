@@ -3,6 +3,7 @@
 #include <iostream>
 #include <list>
 #include <unordered_map>
+#include <vector>
 using namespace std;
 
 class GraphList {
@@ -29,17 +30,17 @@ public:
     // of the graph
     void print() const
     {
-        cout << "Adjacency list for the Graph: " << endl;
+        cerr << "Adjacency list for the Graph: " << endl;
         // Iterate over each vertex
         for (auto i : adjList) {
             // Print the vertex
-            cout << i.first << " -> ";
+            cerr << i.first << " -> ";
             // Iterate over the connected vertices
             for (auto j : i.second) {
                 // Print the connected vertex
-                cout << j << " ";
+                cerr << j << " ";
             }
-            cout << endl;
+            cerr << endl;
         }
     }
 };
