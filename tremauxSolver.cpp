@@ -35,7 +35,7 @@ void log_position(std::array<int, 2> pos) {
 
 void log_maze(std::array<std::array<int, 16>, 17> horz, std::array<std::array<int, 17>, 16> vert) {
         // Flipping the arrays to make them readable for the translator.
-        // TODO: 
+        // TODO:
         std::array<std::array<int, 16>, 17> flippedHorz;
         int horzSize = sizeof(flippedHorz) / sizeof(flippedHorz[0]);
         for (int i = 0; i < horzSize; ++i) {
@@ -83,13 +83,70 @@ int turnLeft() {
 int main(int argc, char* argv[]) {
     MazeMapper mapper;
     Tremaux tremaux;
+    bool completedMap = false;
 
     log_position(curPosition);
-    
+
     mapper.buildHorizontal(curPosition, rotation);
     mapper.buildVertical(curPosition, rotation);
 
-    while (true) {
+    while (!completedMap) {
+        // Update maze visually to show mapped walls
+        if (API::wallFront()) {
+            char wallDir = 'n';
+            switch (rotation) {
+                case 0:
+                    wallDir = 'n';
+                    break;
+                case 1:
+                    wallDir = 'w';
+                    break;
+                case 2:
+                    wallDir = 's';
+                    break;
+                case 3:
+                    wallDir = 'e';
+                    break;
+            }
+            API::setWall(curPosition[0], curPosition[1], wallDir);
+        }
+        if (API::wallLeft()) {
+            char wallDir = 'n';
+            switch ((rotation + 1) % 4) {
+                case 0:
+                    wallDir = 'n';
+                    break;
+                case 1:
+                    wallDir = 'w';
+                    break;
+                case 2:
+                    wallDir = 's';
+                    break;
+                case 3:
+                    wallDir = 'e';
+                    break;
+            }
+            API::setWall(curPosition[0], curPosition[1], wallDir);
+        }
+        if (API::wallRight()) {
+            char wallDir = 'n';
+            switch ((rotation + 3) % 4) {
+                case 0:
+                    wallDir = 'n';
+                    break;
+                case 1:
+                    wallDir = 'w';
+                    break;
+                case 2:
+                    wallDir = 's';
+                    break;
+                case 3:
+                    wallDir = 'e';
+                    break;
+            }
+            API::setWall(curPosition[0], curPosition[1], wallDir);
+        }
+
         log("---------------------");
         log_position(curPosition);
         int corridors = 0;
@@ -133,7 +190,7 @@ int main(int argc, char* argv[]) {
             log("Back Path: " + Util::arrayToString(backWall));
             if (rotation % 2 == 0) log("\tBack Path Value: " + std::to_string(backVal) + " -> " + std::to_string(tremaux.returnHorz()[backWall[1]][backWall[0]]));
             else log("\tBack Path Value: " + std::to_string(backVal) + " -> " + std::to_string(tremaux.returnVert()[backWall[1]][backWall[0]]));
-            
+
             if (!API::wallFront()) {
                 log("Front Path: " + Util::arrayToString(frontWall));
                 if (rotation % 2 == 0) log("\tFront Path Value: " + std::to_string(frontVal) + " -> " + std::to_string(tremaux.returnHorz()[frontWall[1]][frontWall[0]]));
@@ -200,6 +257,8 @@ int main(int argc, char* argv[]) {
 
         auto horz = mapper.buildHorizontal(curPosition, rotation);
         auto vert = mapper.buildVertical(curPosition, rotation);
+
+        completedMap = mapper.mapCompleted();
 
         //log("MAZE SENSING:");
         log_maze(horz, vert);

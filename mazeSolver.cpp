@@ -52,9 +52,9 @@ class MazeSolver {
                         // check for wall above
                         if (y < 15 && horz[15 - y][x] == 0) {
                             graphL.add_edge(x + (y * 16), x + ((y + 1) * 16));
-                            cerr << "No horizontal wall between " << x + (y * 16) << " and " << x + ((y + 1) * 16) << std::endl;
+                            // cerr << "No horizontal wall between " << x + (y * 16) << " and " << x + ((y + 1) * 16) << std::endl;
                         } else if (y < 15 && horz[15 - y][x] == 1) {
-                            cerr << "Horizontal wall between " << x + (y * 16) << " and " << x + ((y + 1) * 16) << std::endl;
+                            // cerr << "Horizontal wall between " << x + (y * 16) << " and " << x + ((y + 1) * 16) << std::endl;
                         }
 
                         // Label the nodes with their coordinates for debugging
