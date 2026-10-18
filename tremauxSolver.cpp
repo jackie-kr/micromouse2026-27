@@ -3,6 +3,7 @@
 #include <cmath>
 #include "include/API.h"
 #include "include/Util.h"
+#include "include/mazeSolver.h"
 #include "Sensing/arrayTranslator.h"
 #include "Sensing/mazeMapper.h"
 #include "tremaux.h"
@@ -83,6 +84,7 @@ int turnLeft() {
 int main(int argc, char* argv[]) {
     MazeMapper mapper;
     Tremaux tremaux;
+    MazeSolver solver;
     bool completedMap = false;
 
     log_position(curPosition);
@@ -262,5 +264,76 @@ int main(int argc, char* argv[]) {
 
         //log("MAZE SENSING:");
         log_maze(horz, vert);
+    }
+
+    auto horz = mapper.buildHorizontal(curPosition, rotation);
+    auto vert = mapper.buildVertical(curPosition, rotation);
+    log_maze(horz, vert);
+
+    solver.createGraph(horz, vert);
+    solver.print();
+
+    vector<MazeSolver::DIRECTION> dirPath = solver.findCenterBFS();
+
+    // Move the mouse to follow the path found by BFS
+    // 0 = up
+    // 1 = left
+    // 2 = down
+    // 3 = right
+    int orientation = 0; // starting facing up {
+
+    std::cerr << "Starting to solve the maze" << std::endl;
+
+    for (const auto& dir : dirPath) {
+        std::cerr << dir << '\n';
+        int actual_dir = 0;
+        // map enum to compass directoin
+        switch (dir) {
+            case MazeSolver::UP:
+                actual_dir = 0;
+                break;
+            case MazeSolver::LEFT:
+                actual_dir = 1;
+                break;
+            case MazeSolver::DOWN:
+                actual_dir = 2;
+                break;
+            case MazeSolver::RIGHT:
+                actual_dir = 3;
+                break;
+            default:
+                actual_dir = 0;
+        }
+
+        // check if we need to turn at all
+        if (actual_dir != orientation) {
+            std::cerr << "We need to turn!" << std::endl;
+
+            if (actual_dir == (orientation + 1) % 4) {
+                // we need to turn left
+                API::turnLeft();
+                orientation++;
+            }
+
+            if (actual_dir == (orientation + 3) % 4) {
+                // Turn right
+                API::turnRight();
+                orientation--;
+            }
+
+            if  (orientation < 0) {
+                orientation = 3;
+            }
+
+            if  (orientation > 3) {
+                orientation = 0;
+            }
+        }
+
+        if (!API::wallFront()) {
+            API::moveForward(1); // move forward one cell
+        } else {
+            std::cerr << "Hey we're gonna hit a wall qwq" << std::endl;
+        }
     }
 }
