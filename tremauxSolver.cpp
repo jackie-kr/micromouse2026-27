@@ -270,17 +270,36 @@ int main(int argc, char* argv[]) {
     auto vert = mapper.buildVertical(curPosition, rotation);
     log_maze(horz, vert);
 
-    solver.createGraph(horz, vert);
+    std::array<std::array<int, 16>, 17> flippedHorz;
+    int horzSize = sizeof(flippedHorz) / sizeof(flippedHorz[0]);
+    for (int i = 0; i < horzSize; ++i) {
+        flippedHorz[i] = horz[horzSize - 1 - i];
+    }
+
+    std::array<std::array<int, 17>, 16> flippedVert;
+    int vertSize = sizeof(flippedVert) / sizeof(flippedVert[0]);
+    for (int i = 0; i < vertSize; ++i) {
+        flippedVert[i] = vert[vertSize - 1 - i];
+    }
+
+    for (int i = 0; i < 16; i++) {
+        std::cerr << "{ ";
+        for (int j = 0; j < 17; j++) {
+            std::cerr << flippedVert[j][i] << ", ";
+        }
+        std::cerr << "}," << std::endl;
+    }
+
+    solver.createGraph(flippedHorz, flippedVert);
     solver.print();
 
-    vector<MazeSolver::DIRECTION> dirPath = solver.findCenterBFS();
+    vector<MazeSolver::DIRECTION> dirPath = solver.findCenterBFS(curPosition[0], curPosition[1]);
 
     // Move the mouse to follow the path found by BFS
     // 0 = up
     // 1 = left
     // 2 = down
     // 3 = right
-    int orientation = 0; // starting facing up {
 
     std::cerr << "Starting to solve the maze" << std::endl;
 
@@ -306,34 +325,30 @@ int main(int argc, char* argv[]) {
         }
 
         // check if we need to turn at all
-        if (actual_dir != orientation) {
-            std::cerr << "We need to turn!" << std::endl;
-
-            if (actual_dir == (orientation + 1) % 4) {
+        if (actual_dir != rotation) {
+            if (actual_dir == (rotation + 1) % 4) {
                 // we need to turn left
-                API::turnLeft();
-                orientation++;
-            }
-
-            if (actual_dir == (orientation + 3) % 4) {
+                std::cerr << "We need to turn left!" << std::endl;
+                turnLeft();
+            } else if (actual_dir == (rotation + 3) % 4) {
                 // Turn right
-                API::turnRight();
-                orientation--;
+                std::cerr << "We need to turn right!" << std::endl;
+                turnRight();
+            } else if (actual_dir == (rotation + 2) % 4) {
+                std::cerr << "We need to 180!" << std::endl;
+                turnRight();
+                turnRight();
             }
 
-            if  (orientation < 0) {
-                orientation = 3;
+            if  (rotation < 0) {
+                rotation = 3;
             }
 
-            if  (orientation > 3) {
-                orientation = 0;
+            if  (rotation > 3) {
+                rotation = 0;
             }
         }
 
-        if (!API::wallFront()) {
-            API::moveForward(1); // move forward one cell
-        } else {
-            std::cerr << "Hey we're gonna hit a wall qwq" << std::endl;
-        }
+        API::moveForward(1); // move forward one cell
     }
 }

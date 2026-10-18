@@ -21,6 +21,8 @@ void MazeSolver::createGraph(std::array<std::array<int, 16>, 17> horz,
                 // cerr << "Vertical wall between " << x + (y * 16) << " and " << (x + 1) + (y * 16) << std::endl;
             }
 
+            // cerr << "Current coordinates (vert wall space): <" << 15 - y << ", " << x + 1 << "> with value " << vert[15 - y][x + 1] << std::endl;
+
             // check for wall above
             if (y < 15 && horz[15 - y][x] == 0) {
                 graphL.add_edge(x + (y * 16), x + ((y + 1) * 16));
@@ -28,6 +30,8 @@ void MazeSolver::createGraph(std::array<std::array<int, 16>, 17> horz,
             } else if (y < 15 && horz[15 - y][x] == 1) {
                 // cerr << "Horizontal wall between " << x + (y * 16) << " and " << x + ((y + 1) * 16) << std::endl;
             }
+
+            // cerr << "Current coordinates (horz wall space): <" << 15 - y << ", " << x << "> with value " << vert[15 - y][x] << std::endl;
 
             // Label the nodes with their coordinates for debugging
             API::setText(x, y, std::to_string(x + (y * 16)));
@@ -58,16 +62,18 @@ bool MazeSolver::foundCenter(int vert) {
 }
 
 // uses BFS to find shortest path to center
-vector<MazeSolver::DIRECTION> MazeSolver::findCenterBFS() {
+vector<MazeSolver::DIRECTION> MazeSolver::findCenterBFS(int startX, int startY) {
     // setup needed ds, parent is used to reconstruct path
     unordered_map<int, vector<int>>& adjList = graphL.getList();
     vector<unsigned int> seen(adjList.size(), false);
     vector<int> parent(adjList.size(), -1);
     queue<int> q;
 
-    // start BFS from 0
-    seen[0] = true;
-    q.push(0);
+    // start BFS from current position
+    int startPos = startX + (16 * startY);
+    std::cerr << "Starting BFS from position: " << startPos << std::endl;
+    seen[startPos] = true;
+    q.push(startPos);
 
     // BFS loop
     while (!q.empty()) {

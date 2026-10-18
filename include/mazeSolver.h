@@ -44,7 +44,7 @@ class MazeSolver {
         bool foundCenter(int vert);
 
         // uses BFS to find shortest path to center
-        vector<DIRECTION> findCenterBFS();
+        vector<DIRECTION> findCenterBFS(int startX, int startY);
 
         // reconstruct path from parent and find the directions from 0
         vector<DIRECTION> constructPath(vector<int>& parent, int start);
