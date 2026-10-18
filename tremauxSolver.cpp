@@ -90,42 +90,66 @@ int main(int argc, char* argv[]) {
     mapper.buildVertical(curPosition, rotation);
 
     while (true) {
+        log("---------------------");
+        log_position(curPosition);
         int corridors = 0;
         if (!API::wallFront()) corridors += 1;
         if (!API::wallLeft()) corridors += 1;
         if (!API::wallRight()) corridors += 1;
         if (corridors > 1) {
-            log("DOIN TREMAUX!!!");
-
             std::array<int, 2> backWall = Util::getWallBack(curPosition, rotation);
             std::array<int, 2> frontWall = Util::getWallFront(curPosition, rotation);
             std::array<int, 2> leftWall = Util::getWallLeft(curPosition, rotation);
             std::array<int, 2> rightWall = Util::getWallRight(curPosition, rotation);
 
+            int backVal;
+            int frontVal;
+            int rightVal;
+            int leftVal;
+            if (rotation % 2 == 0) {
+                backVal = tremaux.returnHorz()[backWall[1]][backWall[0]];
+                frontVal = tremaux.returnHorz()[frontWall[1]][frontWall[0]];
+            }
+            else {
+                backVal = tremaux.returnVert()[backWall[1]][backWall[0]];
+                frontVal = tremaux.returnVert()[frontWall[1]][frontWall[0]];
+            }
+
+            if (rotation % 2 == 0) {
+                rightVal = tremaux.returnVert()[rightWall[1]][rightWall[0]];
+                leftVal = tremaux.returnVert()[leftWall[1]][leftWall[0]];
+            }
+            else {
+                rightVal = tremaux.returnHorz()[rightWall[1]][rightWall[0]];
+                leftVal = tremaux.returnHorz()[leftWall[1]][leftWall[0]];
+            }
+
+            log("Tremaux Last Tile: " + Util::arrayToString(tremaux.returnLastTile()));
+            log("Tremaux Last Choice: " + Util::arrayToString(tremaux.returnLastChoice()));
+            log("Tremaux Last Choice Was Horz: " + std::to_string(tremaux.returnLastChoiceIsHorz()));
+            int result = tremaux.tremauxCheck(curPosition, rotation);
+            //log("Tremaux result: " + std::to_string(result));
+
             log("Back Path: " + Util::arrayToString(backWall));
-            if (rotation % 2 == 0) log("\tBack Path Value: " + std::to_string(tremaux.returnHorz()[backWall[1]][backWall[0]]));
-            else log("\tBack Path Value: " + std::to_string(tremaux.returnVert()[backWall[1]][backWall[0]]));
+            if (rotation % 2 == 0) log("\tBack Path Value: " + std::to_string(backVal) + " -> " + std::to_string(tremaux.returnHorz()[backWall[1]][backWall[0]]));
+            else log("\tBack Path Value: " + std::to_string(backVal) + " -> " + std::to_string(tremaux.returnVert()[backWall[1]][backWall[0]]));
             
             if (!API::wallFront()) {
                 log("Front Path: " + Util::arrayToString(frontWall));
-                if (rotation % 2 == 0) log("\tFront Path Value: " + std::to_string(tremaux.returnHorz()[frontWall[1]][frontWall[0]]));
-                else log("\tFront Path Value: " + std::to_string(tremaux.returnVert()[frontWall[1]][frontWall[0]]));
+                if (rotation % 2 == 0) log("\tFront Path Value: " + std::to_string(frontVal) + " -> " + std::to_string(tremaux.returnHorz()[frontWall[1]][frontWall[0]]));
+                else log("\tFront Path Value: " + std::to_string(backVal) + " -> " +  std::to_string(tremaux.returnVert()[frontWall[1]][frontWall[0]]));
             }
             if (!API::wallLeft()) {
                 log("Left Path: " + Util::arrayToString(leftWall));
-                if (rotation % 2 == 0) log("\tLeft Path Value: " + std::to_string(tremaux.returnVert()[leftWall[1]][leftWall[0]]));
-                else log("\tLeft Path Value: " + std::to_string(tremaux.returnHorz()[leftWall[1]][leftWall[0]]));
+                if (rotation % 2 == 0) log("\tLeft Path Value: " + std::to_string(leftVal) + " -> " + std::to_string(tremaux.returnVert()[leftWall[1]][leftWall[0]]));
+                else log("\tLeft Path Value: " + std::to_string(backVal) + " -> " +  std::to_string(tremaux.returnHorz()[leftWall[1]][leftWall[0]]));
             }
             if (!API::wallRight()) {
                 log("Right Path: " + Util::arrayToString(rightWall));
-                if (rotation % 2 == 0) log("\tRight Path Value: " + std::to_string(tremaux.returnVert()[rightWall[1]][rightWall[0]]));
-                else log("\tRight Path Value: " + std::to_string(tremaux.returnHorz()[rightWall[1]][rightWall[0]]));
+                if (rotation % 2 == 0) log("\tRight Path Value: " + std::to_string(rightVal) + " -> " + std::to_string(tremaux.returnVert()[rightWall[1]][rightWall[0]]));
+                else log("\tRight Path Value: " + std::to_string(backVal) + " -> " +  std::to_string(tremaux.returnHorz()[rightWall[1]][rightWall[0]]));
             }
 
-            
-            int result = tremaux.tremauxCheck(curPosition, rotation);
-            log("Tremaux result: " + std::to_string(result));
-            log("TREMAUX SENSING");
             switch (result) {
                 case 0:
                     API::moveForward();
@@ -177,8 +201,7 @@ int main(int argc, char* argv[]) {
         auto horz = mapper.buildHorizontal(curPosition, rotation);
         auto vert = mapper.buildVertical(curPosition, rotation);
 
-        log("MAZE SENSING:");
+        //log("MAZE SENSING:");
         log_maze(horz, vert);
-        log_position(curPosition);
     }
 }
