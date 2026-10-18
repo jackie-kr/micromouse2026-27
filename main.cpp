@@ -65,8 +65,8 @@ int main(int argc, char* argv[]) {
 
         if (curPosition[0] == std::ceil(API::mazeWidth() / 2) && curPosition[1] == std::ceil(API::mazeHeight() / 2)) inCenter = true;
 
-        auto horz = mapper.buildHorizontal(rotation, curPosition);
-        auto vert = mapper.buildVertical(rotation, curPosition);
+        auto horz = mapper.buildHorizontal(curPosition, rotation);
+        auto vert = mapper.buildVertical(curPosition, rotation);
 
         std::string posResult = "curPosition: <";
         for (int i = 0; i < sizeof(curPosition) / sizeof(curPosition[0]); ++i) {
