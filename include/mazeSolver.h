@@ -29,7 +29,7 @@ class MazeSolver {
             UP_LEFT = 0b0111 // 7
         };
 
-        void createGraph(std::array<std::array<int, 16>, 17> horz,
+        GraphList createGraph(std::array<std::array<int, 16>, 17> horz,
             std::array<std::array<int, 17>, 16> vert);
 
         void print();
@@ -47,5 +47,5 @@ class MazeSolver {
         vector<DIRECTION> findCenterBFS(int startX, int startY);
 
         // reconstruct path from parent and find the directions from 0
-        vector<DIRECTION> constructPath(vector<int>& parent, int start);
+        vector<DIRECTION> constructPath(vector<int>& parent, int start, int startX, int startY);
 };

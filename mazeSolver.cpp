@@ -1,6 +1,7 @@
 #include "include/mazeSolver.h"
+#include "include/graphList.h"
 
-void MazeSolver::createGraph(std::array<std::array<int, 16>, 17> horz,
+GraphList MazeSolver::createGraph(std::array<std::array<int, 16>, 17> horz,
     std::array<std::array<int, 17>, 16> vert) {
     size_t vert_size = vert.size();
     size_t horz_size = horz.size();
@@ -37,6 +38,8 @@ void MazeSolver::createGraph(std::array<std::array<int, 16>, 17> horz,
             API::setText(x, y, std::to_string(x + (y * 16)));
         }
     }
+
+    return graphL;
 }
 
 void MazeSolver::print() {
@@ -81,7 +84,7 @@ vector<MazeSolver::DIRECTION> MazeSolver::findCenterBFS(int startX, int startY) 
         q.pop();
         // end early if found the center
         if (foundCenter(current)) {
-            return constructPath(parent, current);
+            return constructPath(parent, current, startX, startY);
         }
         // iterate over neighbors of current node
         for (const auto& neighbor : adjList.at(current)) {
@@ -95,17 +98,17 @@ vector<MazeSolver::DIRECTION> MazeSolver::findCenterBFS(int startX, int startY) 
     }
 
     // if we reach here, the center wasn't found, return path to 0
-    return constructPath(parent, 0); // wasn't found
+    return constructPath(parent, 0, startX, startY); // wasn't found
 }
 
 // reconstruct path from parent and find the directions from 0
-vector<MazeSolver::DIRECTION> MazeSolver::constructPath(vector<int>& parent, int start) {
+vector<MazeSolver::DIRECTION> MazeSolver::constructPath(vector<int>& parent, int start, int startX, int startY) {
     vector<int> path;
     vector<DIRECTION> directions;
     for (int current = start; current >= 0; current = parent[current])
         path.push_back(current);
     reverse(path.begin(), path.end());
-    pair<int, int> prevCoords = {0, 0};
+    pair<int, int> prevCoords = {startX, startY}; // starting position of the mouse
     for (int i = 1; i < path.size(); i++) {
         pair<int, int> coords = convertVertToCoords(path.at(i));
         API::setColor(coords.first, coords.second, MazeSolver::colors[i % 3]);

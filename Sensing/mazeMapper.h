@@ -1,5 +1,7 @@
 #include <array>
+#include <iostream>
 #include "../include/API.h"
+#include <vector>
 
 class MazeMapper {
 
@@ -123,5 +125,48 @@ class MazeMapper {
     }
     std::array<std::array<int, 17>, 16> getVertical() {
         return vert;
+    }
+
+    std::vector<std::pair<int, int>> getUnexplored(std::array<std::array<int, 16>, 16> manhattanDistances) {
+        // Find the best unknown horizontal wall
+        int distance = 255;
+        bool horizontal = false;
+        std::pair<int, int> bestHorzPair = {-1, -1};
+        for (int i = 0; i < 17; i++) {
+            for (int j = 0; j < 16; j++) {
+                // get the two potential places we can check this wall
+                if (horz[i][j] == 2 && manhattanDistances[i][j] < distance) {
+                    bestHorzPair = {i, j};
+                    distance = manhattanDistances[i][j];
+                    horizontal = true;
+                }
+            }
+        }
+
+        // check for best vertical pair
+        distance = 255;
+        std::pair<int, int> bestVertPair = {-1, -1};
+        for (int i = 0; i < 16; i++) {
+            for (int j = 0; j < 17; j++) {
+                // get the two potential places we can check this wall
+                if (vert[i][j] == 2 && manhattanDistances[i][j] < distance) {
+                    bestVertPair = {i, j};
+                    distance = manhattanDistances[i][j];
+                    horizontal = false;
+                }
+            }
+        }
+
+        std::vector<std::pair<int, int>> result;
+        if (bestHorzPair.first != -1) {
+            result.push_back({bestHorzPair.first, bestHorzPair.second}); // Add the best horizontal pairs
+            result.push_back({bestHorzPair.first - 1, bestHorzPair.second});
+        }
+
+        if (bestVertPair.first != -1) {
+            result.push_back({bestVertPair.first, bestVertPair.second}); // Add the best vertical pairs
+            result.push_back({bestVertPair.first, bestVertPair.second - 1});
+        }
+        return result;
     }
 };
