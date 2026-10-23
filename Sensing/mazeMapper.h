@@ -96,6 +96,68 @@ class MazeMapper {
         return vert;
     }
 
+    // Old implementation for buildHorizontal that can only detect adjacent walls. Use if the map does not reflect the value in mazeGen.h
+    std::array<std::array<int, 16>, 17> buildHorizontalOld(std::array<int, 2> curPosition, int rotation) {
+        switch (rotation) {
+            case 0:
+                //up
+                if (API::wallFront()) horz[curPosition[1] + 1][curPosition[0]] = 1;
+                else horz[curPosition[1] + 1][curPosition[0]] = 0;
+                break;
+            case 1:
+                // left
+                if (API::wallLeft()) horz[curPosition[1]][curPosition[0]] = 1;
+                else horz[curPosition[1]][curPosition[0]] = 0;
+                if (API::wallRight()) horz[curPosition[1] + 1][curPosition[0]] = 1;
+                else horz[curPosition[1] + 1][curPosition[0]] = 0;
+                break;
+            case 2:
+                //down
+                if (API::wallFront()) horz[curPosition[1]][curPosition[0]] = 1;
+                else horz[curPosition[1]][curPosition[0]] = 0;
+                break;
+            case 3:
+                //right
+                if (API::wallLeft()) horz[curPosition[1] + 1][curPosition[0]] = 1;
+                else horz[curPosition[1] + 1][curPosition[0]] = 0;
+                if (API::wallRight()) horz[curPosition[1]][curPosition[0]] = 1;
+                else horz[curPosition[1]][curPosition[0]] = 0;
+                break;
+        }
+        return horz;
+    }
+
+    // Old implementation for buildVertical that can only detect adjacent walls. Use if the map does not reflect the value in mazeGen.h
+    std::array<std::array<int, 17>, 16> buildVerticalOld(std::array<int, 2> curPosition, int rotation) {
+        switch (rotation) {
+            case 0:
+                //up
+                if (API::wallLeft()) vert[curPosition[1]][curPosition[0]] = 1;
+                else vert[curPosition[1]][curPosition[0]] = 0;
+                if (API::wallRight()) vert[curPosition[1]][curPosition[0] + 1] = 1;
+                else vert[curPosition[1]][curPosition[0] + 1] = 0;
+                break;
+            case 1:
+                // left
+                if (API::wallFront()) vert[curPosition[1]][curPosition[0]] = 1;
+                else vert[curPosition[1]][curPosition[0]] = 0;
+                break;
+            case 2:
+                // down
+                if (API::wallLeft()) vert[curPosition[1]][curPosition[0] + 1] = 1;
+                else vert[curPosition[1]][curPosition[0] + 1] = 0;
+                if (API::wallRight()) vert[curPosition[1]][curPosition[0]] = 1;
+                else vert[curPosition[1]][curPosition[0]] = 0;
+                break;
+            case 3:
+                // right
+                if (API::wallFront()) vert[curPosition[1]][curPosition[0] + 1] = 1;
+                else vert[curPosition[1]][curPosition[0] + 1] = 0;
+                break;
+        }
+        return vert;
+    }
+
     bool mapCompleted() {
         bool completed = true;
 

@@ -11,32 +11,32 @@ class Util {
     public:
     // To my knowledge there isn't a way to make it so that we can have this be just one argument for either horz or vert without it being more trouble than its worth?
     // There are definitely ways, but if we want a readable solution this is probably the best way. i think.
-    static std::array<int, 2> wallFront(std::array<int, 2> position, int rotation, std::array<std::array<int, 16>, 17> horz, std::array<std::array<int, 17>, 16> vert) {
+    static std::array<int, 2> wallFront(std::array<int, 2> position, int rotation, std::array<std::array<int, 16>, 17> horz, std::array<std::array<int, 17>, 16> vert, int detRange = range) {
         // The amount of walls ahead of the mouse that can be detected. I wanted this to be a static const, but there was some weird cpp shenanigans happening when I tried, so its just here for now.
         // If whoever is reading this has a better way to do this, by all means please do.
 
-        int max = range;
+        int max = detRange;
         switch (rotation) {
             case 0: // up
-                max = std::min(range, 16 - position[1]);
+                max = std::min(detRange, 16 - position[1]);
                 for (int i = 0; i < max; i++) {
                     if (horz[16 - (position[1] + 1 + i)][position[0]] == 1) return {position[0], position[1] + 1 + i};
                 }
                 break;
             case 1: // left
-                max = std::min(range, 1 + position[0]);
+                max = std::min(detRange, 1 + position[0]);
                 for (int i = 0; i < max; i++) {
                     if (vert[15 - position[1]][position[0] - i] == 1) return {position[0] - i, position[1]};
                 }
                 break;
             case 2: // down
-                max = std::min(range, 1 + position[1]);
+                max = std::min(detRange, 1 + position[1]);
                 for (int i = 0; i < max; i++) {
                     if (horz[16 - (position[1] - i)][position[0]] == 1) return {position[0], position[1] - i};
                 }
                 break;
             case 3: // right
-                max = std::min(range, 16 - position[0]);
+                max = std::min(detRange, 16 - position[0]);
                 for (int i = 0; i < max; i++) {
                     if (vert[15 - position[1]][position[0] + 1 + i] == 1) return {position[0] + 1 + i, position[1]};
                 }
@@ -45,37 +45,37 @@ class Util {
         return {-1, -1};
     }
 
-    static std::array<int, 2> wallLeft(std::array<int, 2> position, int rotation, std::array<std::array<int, 16>, 17> horz, std::array<std::array<int, 17>, 16> vert) {
+    static std::array<int, 2> wallLeft(std::array<int, 2> position, int rotation, std::array<std::array<int, 16>, 17> horz, std::array<std::array<int, 17>, 16> vert, int detRange = range) {
         switch (rotation) {
             case 0:
-                return wallFront(position, 1, horz, vert);
+                return wallFront(position, 1, horz, vert, detRange);
                 break;
             case 1:
-                return wallFront(position, 2, horz, vert);
+                return wallFront(position, 2, horz, vert, detRange);
                 break;
             case 2:
-                return wallFront(position, 3, horz, vert);
+                return wallFront(position, 3, horz, vert, detRange);
                 break;
             case 3:
-                return wallFront(position, 0, horz, vert);
+                return wallFront(position, 0, horz, vert, detRange);
                 break;
         }
         return {-1, -1};
     }
 
-    static std::array<int, 2> wallRight(std::array<int, 2> position, int rotation, std::array<std::array<int, 16>, 17> horz, std::array<std::array<int, 17>, 16> vert) {
+    static std::array<int, 2> wallRight(std::array<int, 2> position, int rotation, std::array<std::array<int, 16>, 17> horz, std::array<std::array<int, 17>, 16> vert, int detRange = range) {
         switch (rotation) {
             case 0:
-                return wallFront(position, 3, horz, vert);
+                return wallFront(position, 3, horz, vert, detRange);
                 break;
             case 1:
-                return wallFront(position, 0, horz, vert);
+                return wallFront(position, 0, horz, vert, detRange);
                 break;
             case 2:
-                return wallFront(position, 1, horz, vert);
+                return wallFront(position, 1, horz, vert, detRange);
                 break;
             case 3:
-                return wallFront(position, 2, horz, vert);
+                return wallFront(position, 2, horz, vert, detRange);
                 break;
         }
         return {-1, -1};
