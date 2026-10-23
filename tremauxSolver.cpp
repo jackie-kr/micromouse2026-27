@@ -290,9 +290,6 @@ int main(int argc, char* argv[]) {
         std::cerr << "}," << std::endl;
     }
 
-    solver.createGraph(flippedHorz, flippedVert);
-    solver.print();
-
     vector<MazeSolver::DIRECTION> dirPath = solver.findCenterBFS(curPosition[0], curPosition[1]);
 
     // Move the mouse to follow the path found by BFS

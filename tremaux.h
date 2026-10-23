@@ -67,7 +67,6 @@ class Tremaux {
         std::array<int, 2> leftWall = Util::getWallLeft(position, rotation);
         std::array<int, 2> rightWall = Util::getWallRight(position, rotation);
 
-        Util::log("tHIS IS THE WALL BACK: " + Util::arrayToString(backWall));
         if (rotation % 2 == 0) {
             if ((lastChoice != backWall) || ((lastChoice == backWall) && !lastChoiceIsHorz) || (position == lastTile)) horz[backWall[1]][backWall[0]] += 1;
             else Util::log("Not adding to tile behind!");

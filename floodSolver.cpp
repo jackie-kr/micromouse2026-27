@@ -271,7 +271,7 @@ int main(int argc, char* argv[]) {
 
     mapper.buildHorizontal({curCol, curRow}, translateRotation(curDir));
     mapper.buildVertical({curCol, curRow}, translateRotation(curDir));
-
+    
     while (!mapper.mapCompleted()) {
         log("New goal found hopefully");
         auto goals = mapper.getUnexplored(floodfill.maze.manhattan_distances);

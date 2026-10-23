@@ -2,8 +2,10 @@
 #include <string>
 #include <cmath>
 #include "include/API.h"
+#include "include/Util.h"
 #include "Sensing/arrayTranslator.h"
 #include "Sensing/mazeMapper.h"
+#include "Sensing/mazeGen.h"
 
 //x, y
 std::array<int, 2> curPosition {0, 0};
@@ -94,6 +96,18 @@ int main(int argc, char* argv[]) {
 
         arrayTranslator converter(flippedHorz, flippedVert);
 
+        /*log("curpos: " + Util::arrayToString(curPosition));
+        MazeGen gen;
+        if (Util::wallFront(curPosition, rotation, gen.getHorz(), gen.getVert()) != std::array<int, 2> {-1, -1}){
+            log("Wall in front at " + Util::arrayToString(Util::wallFront(curPosition, rotation, gen.getHorz(), gen.getVert())));
+        }
+        if (Util::wallLeft(curPosition, rotation, gen.getHorz(), gen.getVert()) != std::array<int, 2> {-1, -1}){
+            log("Wall to the left at " + Util::arrayToString(Util::wallLeft(curPosition, rotation, gen.getHorz(), gen.getVert())));
+        }
+        if (Util::wallRight(curPosition, rotation, gen.getHorz(), gen.getVert()) != std::array<int, 2> {-1, -1}){
+            log("Wall to the right at " + Util::arrayToString(Util::wallRight(curPosition, rotation, gen.getHorz(), gen.getVert())));
+        }*/
+
         std::string mazeResult = "";
         auto maze = converter.translate();
         for (int i = 0; i < 33; i++) {
@@ -104,6 +118,6 @@ int main(int argc, char* argv[]) {
         }
         log(mazeResult);
 
-        log(posResult);
+        //log(posResult);
     }
 }

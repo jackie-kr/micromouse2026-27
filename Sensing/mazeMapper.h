@@ -1,9 +1,16 @@
 #include <array>
 #include <iostream>
 #include "../include/API.h"
+#include "../include/Util.h"
+#include "mazeGen.h"
 #include <vector>
 
 class MazeMapper {
+    MazeGen gen;
+    const int range = 3;
+
+    std::array<std::array<int, 16>, 17> omniscientHorz = gen.getHorz();
+    std::array<std::array<int, 17>, 16> omniscientVert = gen.getVert();
 
     // dont ask me why we need to write these things out in full. i dont know
     // but whenever we dont, random walls appear. its scary. im scared.
@@ -49,57 +56,42 @@ class MazeMapper {
     MazeMapper() {};
 
     std::array<std::array<int, 16>, 17> buildHorizontal(std::array<int, 2> curPosition, int rotation) {
-        switch (rotation) {
-            case 0:
-                //up
-                if (API::wallFront()) horz[curPosition[1] + 1][curPosition[0]] = 1;
-                else horz[curPosition[1] + 1][curPosition[0]] = 0;
+
+        int maxUp = std::min(range, 16 - curPosition[1]);
+        int maxDown = std::min(range, 1 + curPosition[1]);
+        for (int i = 0; i < maxUp; i++) {
+            if (omniscientHorz[16 - (curPosition[1] + 1 + i)][curPosition[0]] == 1) {
+                horz[curPosition[1] + 1 + i][curPosition[0]] = 1;
                 break;
-            case 1:
-                // left
-                if (API::wallLeft()) horz[curPosition[1]][curPosition[0]] = 1;
-                else horz[curPosition[1]][curPosition[0]] = 0;
-                if (API::wallRight()) horz[curPosition[1] + 1][curPosition[0]] = 1;
-                else horz[curPosition[1] + 1][curPosition[0]] = 0;
+            }
+            else horz[curPosition[1] + 1 + i][curPosition[0]] = 0;
+        }
+        for (int i = 0; i < maxDown; i++) {
+            if (omniscientHorz[16 - (curPosition[1] - i)][curPosition[0]] == 1) {
+                horz[curPosition[1] - i][curPosition[0]] = 1;
                 break;
-            case 2:
-                if (API::wallFront()) horz[curPosition[1]][curPosition[0]] = 1;
-                else horz[curPosition[1]][curPosition[0]] = 0;
-                break;
-            case 3:
-                if (API::wallLeft()) horz[curPosition[1] + 1][curPosition[0]] = 1;
-                else horz[curPosition[1] + 1][curPosition[0]] = 0;
-                if (API::wallRight()) horz[curPosition[1]][curPosition[0]] = 1;
-                else horz[curPosition[1]][curPosition[0]] = 0;
-                break;
+            }
+            else horz[curPosition[1] - i][curPosition[0]] = 0;
         }
         return horz;
     }
 
     std::array<std::array<int, 17>, 16> buildVertical(std::array<int, 2> curPosition, int rotation) {
-        switch (rotation) {
-            case 0:
-                //up
-                if (API::wallLeft()) vert[curPosition[1]][curPosition[0]] = 1;
-                else vert[curPosition[1]][curPosition[0]] = 0;
-                if (API::wallRight()) vert[curPosition[1]][curPosition[0] + 1] = 1;
-                else vert[curPosition[1]][curPosition[0] + 1] = 0;
+        int maxLeft = std::min(range, 1 + curPosition[0]);
+        for (int i = 0; i < maxLeft; i++) {
+            if (omniscientVert[15 - curPosition[1]][curPosition[0] - i] == 1){
+                vert[curPosition[1]][curPosition[0]-i] = 1;
                 break;
-            case 1:
-                // left
-                if (API::wallFront()) vert[curPosition[1]][curPosition[0]] = 1;
-                else vert[curPosition[1]][curPosition[0]] = 0;
+            }
+            else vert[curPosition[1]][curPosition[0]-1] = 0;
+        }
+        int maxRight = std::min(range, 16 - curPosition[0]);
+        for (int i = 0; i < maxRight; i++) {
+            if (omniscientVert[15 - curPosition[1]][curPosition[0] + 1 + i] == 1){
+                vert[curPosition[1]][curPosition[0] + 1 + i] = 1;
                 break;
-            case 2:
-                if (API::wallLeft()) vert[curPosition[1]][curPosition[0] + 1] = 1;
-                else vert[curPosition[1]][curPosition[0] + 1] = 0;
-                if (API::wallRight()) vert[curPosition[1]][curPosition[0]] = 1;
-                else vert[curPosition[1]][curPosition[0]] = 0;
-                break;
-            case 3:
-                if (API::wallFront()) vert[curPosition[1]][curPosition[0] + 1] = 1;
-                else vert[curPosition[1]][curPosition[0] + 1] = 0;
-                break;
+            }
+            else vert[curPosition[1]][curPosition[0] + 1 + i] = 0;
         }
         return vert;
     }
@@ -110,8 +102,8 @@ class MazeMapper {
         // check for unmapped walls
         for (int i = 0; i < 16; i++) {
             for (int j = 0; j < 17; j++) {
-                completed = vert[j][i] != 2 && completed;
-                completed = horz[i][j] != 2 && completed;
+                completed = vert[i][j] != 2 && completed;
+                completed = horz[j][i] != 2 && completed;
 
                 if (!completed) return false;
             }
