@@ -43,7 +43,7 @@ GraphList MazeSolver::createGraph(std::array<std::array<int, 16>, 17> horz,
 }
 
 void MazeSolver::addEdge(int u, int v) {
-    graphL.add_edge(u, v);
+    graphL.add_edge_directional(u, v);
 }
 
 void MazeSolver::print() {

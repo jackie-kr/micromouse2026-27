@@ -1,7 +1,9 @@
 #include <array>
+#include <cstddef>
 #include <iostream>
 #include "../include/API.h"
 #include "../include/Util.h"
+#include "../include/mazeSolver.h"
 #include "mazeGen.h"
 #include <vector>
 
@@ -92,7 +94,7 @@ class MazeMapper {
         log_maze(omniscientHorz, omniscientVert);
     };
 
-    std::array<std::array<int, 16>, 17> buildHorizontal(std::array<int, 2> curPosition, int rotation) {
+    std::array<std::array<int, 16>, 17> buildHorizontal(std::array<int, 2> curPosition, int rotation, MazeSolver *solver) {
 
         int maxUp = std::min(range, 16 - curPosition[1]);
         int maxDown = std::min(range, 1 + curPosition[1]);
@@ -105,6 +107,7 @@ class MazeMapper {
             }
             else {
                 horz[curPosition[1] + 1 + i][curPosition[0]] = 0;
+                solver->addEdge(curPosition[0] + (curPosition[1] + i * 16), curPosition[0] + (curPosition[1] + 1 + i * 16));
                 // std::cerr << "Horz: No Wall at (" << 16 - (curPosition[1] + 1 + i) << ", " << curPosition[0] << ").\n";
             }
         }

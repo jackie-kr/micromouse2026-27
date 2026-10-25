@@ -26,6 +26,10 @@ public:
         adjList[v].push_back(u);
     }
 
+    void add_edge_directional(int u, int v) {
+        adjList[u].push_back(v);
+    }
+
     // Function to print the adjacency list representation
     // of the graph
     void print() const

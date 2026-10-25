@@ -13,6 +13,7 @@
 #include "Sensing/arrayTranslator.h"
 using namespace std;
 Flood floodfill;
+MazeSolver solve;
 
 enum Action { FORWARD, LEFT, RIGHT, IDLE, AROUND};
 
@@ -308,7 +309,7 @@ int main(int argc, char* argv[]) {
     MazeMapper mapper;
     log("Running...");
 
-    auto horz = mapper.buildHorizontal({curCol, curRow}, translateRotation(curDir));
+    auto horz = mapper.buildHorizontal({curCol, curRow}, translateRotation(curDir), &solve);
     auto vert = mapper.buildVertical({curCol, curRow}, translateRotation(curDir));
 
     while (!mapper.mapCompleted()) {
@@ -341,7 +342,7 @@ int main(int argc, char* argv[]) {
                 curDir = (curDir + 2) % 4;
             }
 
-            horz = mapper.buildHorizontal({curCol, curRow}, translateRotation(curDir));
+            horz = mapper.buildHorizontal({curCol, curRow}, translateRotation(curDir), &solve);
             vert = mapper.buildVertical({curCol, curRow}, translateRotation(curDir));
 
             // log_maze(horz, vert);
@@ -353,5 +354,8 @@ int main(int argc, char* argv[]) {
             API::clearColor(goal.second, goal.first);
         }
     }
+
+    solve.print();
+
     return 0;
 }
