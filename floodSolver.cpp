@@ -76,7 +76,7 @@ void Flood::setWalls(std::array<std::array<int, 16>, 17> horz, std::array<std::a
             // if there's a wall to the right
             if (x < 15 && vert[15 - y][x + 1] == 1) {
                 // set the current coord to have a wall to the right
-                std::cerr << "Wall at right of (" << x << ", " << 15 - y << ")." << std::endl;
+                // std::cerr << "Wall at right of (" << x << ", " << 15 - y << ")." << std::endl;
                 maze.horizontal_walls[15 - y][x].second = 1;
                 maze.horizontal_walls[15 - y][x + 1].first = 1;
             } else if (x == 15) {
@@ -91,7 +91,7 @@ void Flood::setWalls(std::array<std::array<int, 16>, 17> horz, std::array<std::a
 
             // Check for wall below
             if (y < 15 && horz[15 - y][x] == 1) {
-                std::cerr << "Wall below (" << x << ", " << 15 - y << ")." << std::endl;
+                // std::cerr << "Wall below (" << x << ", " << 15 - y << ")." << std::endl;
                 maze.vertical_walls[15 - y][x].second = 1;
                 maze.vertical_walls[15 - y - 1][x].first = 1;
             } else if (y == 15) {
