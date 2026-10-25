@@ -223,6 +223,22 @@ class MazeMapper {
         return completed;
     }
 
+    float percentComplete() {
+        float numUnknown = 0;
+        for (int i = 0; i < 16; i++) {
+            for (int j = 0; j < 17; j++) {
+                if (vert[i][j] == 2) {
+                    numUnknown++;
+                }
+                if (horz[j][i] == 2) {
+                    numUnknown++;
+                }
+            }
+        }
+
+        return (1.0 - (numUnknown / (2.0 * 16.0 * 17.0))) * 100.0;
+    }
+
     std::array<std::array<int, 16>, 17> getHorizontal() {
         return horz;
     }

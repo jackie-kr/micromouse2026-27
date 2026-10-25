@@ -344,7 +344,8 @@ int main(int argc, char* argv[]) {
             horz = mapper.buildHorizontal({curCol, curRow}, translateRotation(curDir));
             vert = mapper.buildVertical({curCol, curRow}, translateRotation(curDir));
 
-            log_maze(horz, vert);
+            // log_maze(horz, vert);
+            std::cerr << "Percent Mapped: " << mapper.percentComplete() << "%" << std::endl;
         }
 
         for (auto goal : goals) {

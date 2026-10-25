@@ -257,8 +257,8 @@ int main(int argc, char* argv[]) {
 
         if (curPosition[0] == std::ceil(API::mazeWidth() / 2) && curPosition[1] == std::ceil(API::mazeHeight() / 2)) inCenter = true;
 
-        auto horz = mapper.buildHorizontal(curPosition, rotation);
-        auto vert = mapper.buildVertical(curPosition, rotation);
+        auto horz = mapper.buildHorizontalOld(curPosition, rotation);
+        auto vert = mapper.buildVerticalOld(curPosition, rotation);
 
         completedMap = mapper.mapCompleted();
 
@@ -266,8 +266,8 @@ int main(int argc, char* argv[]) {
         log_maze(horz, vert);
     }
 
-    auto horz = mapper.buildHorizontal(curPosition, rotation);
-    auto vert = mapper.buildVertical(curPosition, rotation);
+    auto horz = mapper.buildHorizontalOld(curPosition, rotation);
+    auto vert = mapper.buildVerticalOld(curPosition, rotation);
     log_maze(horz, vert);
 
     std::array<std::array<int, 16>, 17> flippedHorz;
@@ -290,6 +290,7 @@ int main(int argc, char* argv[]) {
         std::cerr << "}," << std::endl;
     }
 
+    solver.createGraph(flippedHorz, flippedVert);
     vector<MazeSolver::DIRECTION> dirPath = solver.findCenterBFS(curPosition[0], curPosition[1]);
 
     // Move the mouse to follow the path found by BFS

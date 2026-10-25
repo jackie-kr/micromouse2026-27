@@ -32,6 +32,8 @@ class MazeSolver {
         GraphList createGraph(std::array<std::array<int, 16>, 17> horz,
             std::array<std::array<int, 17>, 16> vert);
 
+        void addEdge(int u, int v);
+
         void print();
 
         // convert a vertex to coordinates (x, y)
