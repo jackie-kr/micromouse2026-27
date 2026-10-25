@@ -41,6 +41,7 @@ bool atGoal(int row, int col, std::vector<std::pair<int, int>> goals) {
     for (const auto& goal : goals) {
         if (row == goal.first && col == goal.second) {
             at_goal = true;
+            std::cerr << "At goal (" << to_string(goal.second) << ", " << to_string(goal.first) << ").\n";
             break;
         }
     }
@@ -66,8 +67,45 @@ void Flood::setWall(int row, int col, int direction) {
         if(col - 1 >= 0) maze.horizontal_walls[row][col - 1].second = 1; // East wall of the cell to the left
     }
     char cdir = "nesw"[direction];
-    API::setWall(col, row, cdir);
+    // API::setWall(col, row, cdir);
 }
+
+void Flood::setWalls(std::array<std::array<int, 16>, 17> horz, std::array<std::array<int, 17>, 16> vert) {
+    for (int y = 0; y < 16; y++) {
+        for (int x = 0; x < 16; x++) {
+            // if there's a wall to the right
+            if (x < 15 && vert[15 - y][x + 1] == 1) {
+                // set the current coord to have a wall to the right
+                std::cerr << "Wall at right of (" << x << ", " << 15 - y << ")." << std::endl;
+                maze.horizontal_walls[15 - y][x].second = 1;
+                maze.horizontal_walls[15 - y][x + 1].first = 1;
+            } else if (x == 15) {
+                // at the far right
+                maze.horizontal_walls[15 - y][x].second = 1;
+            }
+
+            if (x == 0) {
+                // Make sure left is filled
+                maze.horizontal_walls[15 - y][x].first = 1;
+            }
+
+            // Check for wall below
+            if (y < 15 && horz[15 - y][x] == 1) {
+                std::cerr << "Wall below (" << x << ", " << 15 - y << ")." << std::endl;
+                maze.vertical_walls[15 - y][x].second = 1;
+                maze.vertical_walls[15 - y - 1][x].first = 1;
+            } else if (y == 15) {
+                // If at top
+                maze.vertical_walls[15 - y][x].second = 1;
+            }
+
+            if (y == 0) {
+                maze.vertical_walls[15 - y][x].first = 1;
+            }
+        }
+    }
+}
+
 void Flood::detectWalls(vector<int> sensorDistances, int row, int col, int direction){
     if(row < 0 || row >= 16 || col < 0 || col >= 16) return; // out of bounds
     if(API::wallFront()) { // North Wall
@@ -109,7 +147,7 @@ void Flood::floodfill(std::vector<pair<int, int>> goals) {
 
     for (auto goal : goals) {
         if (goal.first < 16  && goal.second < 16) {
-            log("Exploring to goal: (" + to_string(goal.second) + ", " + to_string(goal.first) + ")");
+            // log("Exploring to goal: (" + to_string(goal.second) + ", " + to_string(goal.first) + ")");
             maze.manhattan_distances[goal.first][goal.second] = 0; //row,column
             q.push({goal.first, goal.second});
             reached[goal.first][goal.second] = true; // Marking the goal cells as reached
@@ -205,8 +243,9 @@ void moveForwardUpdatePos() {
 
 }
 
-Action solver(std::vector<pair<int, int>> goals) {
-    floodfill.detectWalls({}, curRow, curCol, curDir);
+Action solver(std::vector<pair<int, int>> goals, std::array<std::array<int, 16>, 17> horz, std::array<std::array<int, 17>, 16> vert) {
+    // floodfill.detectWalls({}, curRow, curCol, curDir);
+    floodfill.setWalls(horz, vert);
     floodfill.floodfill(goals);
     int bestDir = floodfill.getNextMove(curRow, curCol);
 
@@ -269,13 +308,13 @@ int main(int argc, char* argv[]) {
     MazeMapper mapper;
     log("Running...");
 
-    mapper.buildHorizontal({curCol, curRow}, translateRotation(curDir));
-    mapper.buildVertical({curCol, curRow}, translateRotation(curDir));
+    auto horz = mapper.buildHorizontal({curCol, curRow}, translateRotation(curDir));
+    auto vert = mapper.buildVertical({curCol, curRow}, translateRotation(curDir));
 
     while (!mapper.mapCompleted()) {
-        log("New goal found hopefully");
+        // log("New goal found hopefully");
         auto goals = mapper.getUnexplored(floodfill.maze.manhattan_distances);
-        log("New goal found: " + to_string(goals.size()) + " goals");
+        // log("New goal found: " + to_string(goals.size()) + " goals");
 
         for (auto goal : goals) {
             API::setColor(goal.second, goal.first, 'g');
@@ -283,7 +322,7 @@ int main(int argc, char* argv[]) {
         }
 
         while (!atGoal(curRow, curCol, goals)) {
-            Action action = solver(goals);
+            Action action = solver(goals, horz, vert);
 
             if (action == FORWARD) {
                 API::moveForward();
@@ -302,17 +341,16 @@ int main(int argc, char* argv[]) {
                 curDir = (curDir + 2) % 4;
             }
 
-            auto horz = mapper.buildHorizontal({curCol, curRow}, translateRotation(curDir));
-            auto vert = mapper.buildVertical({curCol, curRow}, translateRotation(curDir));
+            horz = mapper.buildHorizontal({curCol, curRow}, translateRotation(curDir));
+            vert = mapper.buildVertical({curCol, curRow}, translateRotation(curDir));
 
             log_maze(horz, vert);
         }
 
         for (auto goal : goals) {
-            log("Reached goal: (" + to_string(goal.second) + ", " + to_string(goal.first) + ")");
+            // log("Reached goal: (" + to_string(goal.second) + ", " + to_string(goal.first) + ")");
             API::clearColor(goal.second, goal.first);
         }
-
     }
     return 0;
 }

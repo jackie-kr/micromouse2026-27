@@ -52,8 +52,45 @@ class MazeMapper {
         {1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1},
     }};
 
+    void log(const std::string& text) {
+        std::cerr << text << std::endl;
+    }
+
+    void log_maze(std::array<std::array<int, 16>, 17> horz, std::array<std::array<int, 17>, 16> vert) {
+            // Flipping the arrays to make them readable for the translator.
+            // TODO:
+            std::array<std::array<int, 16>, 17> flippedHorz;
+            int horzSize = sizeof(flippedHorz) / sizeof(flippedHorz[0]);
+            for (int i = 0; i < horzSize; ++i) {
+                flippedHorz[i] = horz[horzSize - 1 - i];
+            }
+
+            std::array<std::array<int, 17>, 16> flippedVert;
+            int vertSize = sizeof(flippedVert) / sizeof(flippedVert[0]);
+            for (int i = 0; i < vertSize; ++i) {
+                flippedVert[i] = vert[vertSize - 1 - i];
+            }
+
+
+
+            arrayTranslator converter(flippedHorz, flippedVert);
+
+            std::string mazeResult = "";
+            auto maze = converter.translate();
+            for (int i = 0; i < 33; i++) {
+                for (int j = 0; j < 65; j++) {
+                    mazeResult += maze[i][j];
+                }
+                mazeResult += ("\n");
+            }
+            log(mazeResult);
+    }
+
     public:
-    MazeMapper() {};
+    MazeMapper() {
+        std::cerr << "Omniscient maze: \n";
+        log_maze(omniscientHorz, omniscientVert);
+    };
 
     std::array<std::array<int, 16>, 17> buildHorizontal(std::array<int, 2> curPosition, int rotation) {
 
@@ -62,13 +99,19 @@ class MazeMapper {
         for (int i = 0; i < maxUp; i++) {
             if (omniscientHorz[16 - (curPosition[1] + 1 + i)][curPosition[0]] == 1) {
                 horz[curPosition[1] + 1 + i][curPosition[0]] = 1;
+                // std::cerr << "Horz: Wall found at (" << 16 - (curPosition[1] + 1 + i) << ", " << curPosition[0] << ").\n";
+                API::setWall(curPosition[0], curPosition[1] + i, 'n');
                 break;
             }
-            else horz[curPosition[1] + 1 + i][curPosition[0]] = 0;
+            else {
+                horz[curPosition[1] + 1 + i][curPosition[0]] = 0;
+                // std::cerr << "Horz: No Wall at (" << 16 - (curPosition[1] + 1 + i) << ", " << curPosition[0] << ").\n";
+            }
         }
         for (int i = 0; i < maxDown; i++) {
             if (omniscientHorz[16 - (curPosition[1] - i)][curPosition[0]] == 1) {
                 horz[curPosition[1] - i][curPosition[0]] = 1;
+                API::setWall(curPosition[0], curPosition[1] - i, 's');
                 break;
             }
             else horz[curPosition[1] - i][curPosition[0]] = 0;
@@ -80,15 +123,21 @@ class MazeMapper {
         int maxLeft = std::min(range, 1 + curPosition[0]);
         for (int i = 0; i < maxLeft; i++) {
             if (omniscientVert[15 - curPosition[1]][curPosition[0] - i] == 1){
+                // std::cerr << "Vert: Wall found at (" << 15 - curPosition[1] << ", " << curPosition[0] - i << ")." << std::endl;
                 vert[curPosition[1]][curPosition[0]-i] = 1;
+                API::setWall(curPosition[0]-i, curPosition[1], 'w');
                 break;
             }
-            else vert[curPosition[1]][curPosition[0]-1] = 0;
+            else {
+                vert[curPosition[1]][curPosition[0]-i] = 0;
+                // std::cerr << "Vert: No wall at (" << 15 - curPosition[1] << ", " << curPosition[0] - i << ")." << std::endl;
+            }
         }
         int maxRight = std::min(range, 16 - curPosition[0]);
         for (int i = 0; i < maxRight; i++) {
             if (omniscientVert[15 - curPosition[1]][curPosition[0] + 1 + i] == 1){
                 vert[curPosition[1]][curPosition[0] + 1 + i] = 1;
+                API::setWall(curPosition[0] + i, curPosition[1], 'e');
                 break;
             }
             else vert[curPosition[1]][curPosition[0] + 1 + i] = 0;

@@ -26,6 +26,7 @@ public:
     grid maze;
     void setThreshhold(int threshhold) {wall_threshhold = threshhold;}
     void setWall(int row, int col, int direction);
+    void setWalls(std::array<std::array<int, 16>, 17> horz, std::array<std::array<int, 17>, 16> vert);
     void detectWalls(vector<int> sensorDistances, int row, int col, int direction);
     void updateWall(int row, int col, bool front, bool left, bool right, int direction);
     void floodfill(std::vector<pair<int, int>> goals);
