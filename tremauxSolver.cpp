@@ -89,8 +89,8 @@ int main(int argc, char* argv[]) {
 
     log_position(curPosition);
 
-    mapper.buildHorizontal(curPosition, rotation);
-    mapper.buildVertical(curPosition, rotation);
+    mapper.buildHorizontalOld(curPosition, rotation);
+    mapper.buildVerticalOld(curPosition, rotation);
 
     while (!completedMap) {
         // Update maze visually to show mapped walls
@@ -266,31 +266,13 @@ int main(int argc, char* argv[]) {
         log_maze(horz, vert);
     }
 
+    mapper.blockHorizontal();
+    mapper.blockVertical();
+
     auto horz = mapper.buildHorizontalOld(curPosition, rotation);
     auto vert = mapper.buildVerticalOld(curPosition, rotation);
     log_maze(horz, vert);
 
-    std::array<std::array<int, 16>, 17> flippedHorz;
-    int horzSize = sizeof(flippedHorz) / sizeof(flippedHorz[0]);
-    for (int i = 0; i < horzSize; ++i) {
-        flippedHorz[i] = horz[horzSize - 1 - i];
-    }
-
-    std::array<std::array<int, 17>, 16> flippedVert;
-    int vertSize = sizeof(flippedVert) / sizeof(flippedVert[0]);
-    for (int i = 0; i < vertSize; ++i) {
-        flippedVert[i] = vert[vertSize - 1 - i];
-    }
-
-    for (int i = 0; i < 16; i++) {
-        std::cerr << "{ ";
-        for (int j = 0; j < 17; j++) {
-            std::cerr << flippedVert[j][i] << ", ";
-        }
-        std::cerr << "}," << std::endl;
-    }
-
-    solver.createGraph(flippedHorz, flippedVert);
     vector<MazeSolver::DIRECTION> dirPath = solver.findCenterBFS(curPosition[0], curPosition[1]);
 
     // Move the mouse to follow the path found by BFS

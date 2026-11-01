@@ -1,3 +1,5 @@
+#pragma once
+
 #include <array>
 #include <cstddef>
 #include <iostream>
@@ -240,6 +242,21 @@ class MazeMapper {
         }
 
         return (1.0 - (numUnknown / (2.0 * 16.0 * 17.0))) * 100.0;
+    }
+
+    std::array<std::array<int, 16>, 17> blockHorizontal() {
+        for (int i = 0; i < 17; i++) {
+            for (int j = 0; j < 16; j++) {
+                if (horz[i][j] == 2) horz[i][j] = 1;
+            }
+        }
+    }
+    std::array<std::array<int, 17>, 16> blockVertical() {
+        for (int i = 0; i < 16; i++) {
+            for (int j = 0; j < 17; j++) {
+                if (vert[i][j] == 2) vert[i][j] = 1;
+            }
+        }
     }
 
     std::array<std::array<int, 16>, 17> getHorizontal() {

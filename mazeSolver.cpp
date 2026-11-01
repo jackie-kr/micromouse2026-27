@@ -80,6 +80,7 @@ vector<MazeSolver::DIRECTION> MazeSolver::findCenterBFS(int startX, int startY) 
     int startPos = startX + (16 * startY);
     std::cerr << "Starting BFS from position: " << startPos << std::endl;
     seen[startPos] = true;
+    std::cerr << "Test!" << std::endl;
     q.push(startPos);
 
     // BFS loop
