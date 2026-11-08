@@ -8,10 +8,11 @@
 #include "../include/mazeSolver.h"
 #include "mazeGen.h"
 #include <vector>
+#include <algorithm>
 
 class MazeMapper {
     MazeGen gen;
-    const int range = 3;
+    const int range = 10;
 
     std::array<std::array<int, 16>, 17> omniscientHorz = gen.getHorz();
     std::array<std::array<int, 17>, 16> omniscientVert = gen.getVert();
@@ -97,9 +98,9 @@ class MazeMapper {
     };
 
     std::array<std::array<int, 16>, 17> buildHorizontal(std::array<int, 2> curPosition, int rotation, MazeSolver *solver) {
-
         int maxUp = std::min(range, 16 - curPosition[1]);
         int maxDown = std::min(range, 1 + curPosition[1]);
+        std::cerr << "Current Position: <" << curPosition[0] << ", " << curPosition[1] << ">" << std::endl;
         for (int i = 0; i < maxUp; i++) {
             if (omniscientHorz[16 - (curPosition[1] + 1 + i)][curPosition[0]] == 1) {
                 horz[curPosition[1] + 1 + i][curPosition[0]] = 1;
@@ -109,8 +110,14 @@ class MazeMapper {
             }
             else {
                 horz[curPosition[1] + 1 + i][curPosition[0]] = 0;
-                solver->addEdge(curPosition[0] + (curPosition[1] + i * 16), curPosition[0] + (curPosition[1] + 1 + i * 16));
-                // std::cerr << "Horz: No Wall at (" << 16 - (curPosition[1] + 1 + i) << ", " << curPosition[0] << ").\n";
+                vector<int> knownCon = solver->getGraph().getList()[curPosition[0] + ((curPosition[1] + i) * 16)];
+
+                // if we don't already know this is passible add the edge
+                if (std::find(knownCon.begin(), knownCon.end(), curPosition[0] + ((curPosition[1] + 1 + i) * 16)) == knownCon.end()) {
+                    solver->addEdge(curPosition[0] + ((curPosition[1] + i) * 16), curPosition[0] + ((curPosition[1] + 1 + i) * 16));
+                   // std::cerr << "Adding edge between " << curPosition[0] + ((curPosition[1] + i) * 16) << " and " << curPosition[0] + ((curPosition[1] + 1 + i) * 16) << std::endl;
+                }
+                // std::cerr << "Horz: No Wall at (" << curPosition[0] << ", " <<  (curPosition[1] + 1 + i) << ").\n";
             }
         }
         for (int i = 0; i < maxDown; i++) {
@@ -119,12 +126,67 @@ class MazeMapper {
                 API::setWall(curPosition[0], curPosition[1] - i, 's');
                 break;
             }
-            else horz[curPosition[1] - i][curPosition[0]] = 0;
+            else {
+                horz[curPosition[1] - i][curPosition[0]] = 0;
+                vector<int> knownCon = solver->getGraph().getList()[curPosition[0] + ((curPosition[1] - i) * 16)];
+
+                // if we don't already know this is passible add the edge
+                if (std::find(knownCon.begin(), knownCon.end(), curPosition[0] + ((curPosition[1] - 1 - i) * 16)) == knownCon.end()) {
+                    solver->addEdge(curPosition[0] + ((curPosition[1] - i) * 16), curPosition[0] + ((curPosition[1] - 1 - i) * 16));
+                   // std::cerr << "Adding edge between " << curPosition[0] + ((curPosition[1] + i) * 16) << " and " << curPosition[0] + ((curPosition[1] + 1 + i) * 16) << std::endl;
+                }
+                // std::cerr << "Horz: No Wall at (" << curPosition[0] << ", " <<  (curPosition[1] + 1 + i) << ").\n";
+            }
         }
         return horz;
     }
 
-    std::array<std::array<int, 17>, 16> buildVertical(std::array<int, 2> curPosition, int rotation) {
+    std::array<std::array<int, 17>, 16> buildVertical(std::array<int, 2> curPosition, int rotation, MazeSolver *solver) {
+        int maxLeft = std::min(range, 1 + curPosition[0]);
+        for (int i = 0; i < maxLeft; i++) {
+            if (omniscientVert[15 - curPosition[1]][curPosition[0] - i] == 1){
+                // std::cerr << "Vert: Wall found at (" << 15 - curPosition[1] << ", " << curPosition[0] - i << ")." << std::endl;
+                vert[curPosition[1]][curPosition[0]-i] = 1;
+                API::setWall(curPosition[0]-i, curPosition[1], 'w');
+                break;
+            }
+            else {
+                vert[curPosition[1]][curPosition[0] - i] = 0;
+                vector<int> knownCon = solver->getGraph().getList()[curPosition[0] - i + (curPosition[1] * 16)];
+
+                // if we don't already know this is passible add the edge
+                if (std::find(knownCon.begin(), knownCon.end(), curPosition[0] - i - 1 + (curPosition[1] * 16)) == knownCon.end()) {
+                    solver->addEdge(curPosition[0] - i + (curPosition[1] * 16), curPosition[0] - i - 1 + (curPosition[1] * 16));
+                   // std::cerr << "Adding edge between " << curPosition[0] + ((curPosition[1] + i) * 16) << " and " << curPosition[0] + ((curPosition[1] + 1 + i) * 16) << std::endl;
+                }
+            }
+                // std::cerr << "Vert: No wall at (" << 15 - curPosition[1] << ", " << curPosition[0] - i << ")." << std::endl;
+        }
+        int maxRight = std::min(range, 16 - curPosition[0]);
+        for (int i = 0; i < maxRight; i++) {
+            if (omniscientVert[15 - curPosition[1]][curPosition[0] + 1 + i] == 1){
+                vert[curPosition[1]][curPosition[0] + 1 + i] = 1;
+                API::setWall(curPosition[0] + i, curPosition[1], 'e');
+                break;
+            }
+            else {
+                vert[curPosition[1]][curPosition[0] + 1 + i] = 0;
+                vector<int> knownCon = solver->getGraph().getList()[curPosition[0] + i + (curPosition[1] * 16)];
+
+                // if we don't already know this is passible add the edge
+                if (std::find(knownCon.begin(), knownCon.end(), curPosition[0] + i + 1 + (curPosition[1] * 16)) == knownCon.end()) {
+                    solver->addEdge(curPosition[0] + i + (curPosition[1] * 16), curPosition[0] + i + 1 + (curPosition[1] * 16));
+                   // std::cerr << "Adding edge between " << curPosition[0] + ((curPosition[1] + i) * 16) << " and " << curPosition[0] + ((curPosition[1] + 1 + i) * 16) << std::endl;
+                }
+            }
+        }
+        return vert;
+    }
+
+    std::array<int, 4> getRanges(std::array<int, 2> curPosition, int rotation) {
+        std::array<int, 4> ranges = {0, 0, 0, 0};
+
+        // check left and right
         int maxLeft = std::min(range, 1 + curPosition[0]);
         for (int i = 0; i < maxLeft; i++) {
             if (omniscientVert[15 - curPosition[1]][curPosition[0] - i] == 1){
@@ -147,7 +209,7 @@ class MazeMapper {
             }
             else vert[curPosition[1]][curPosition[0] + 1 + i] = 0;
         }
-        return vert;
+        // return vert;
     }
 
     // Old implementation for buildHorizontal that can only detect adjacent walls. Use if the map does not reflect the value in mazeGen.h
@@ -244,20 +306,20 @@ class MazeMapper {
         return (1.0 - (numUnknown / (2.0 * 16.0 * 17.0))) * 100.0;
     }
 
-    std::array<std::array<int, 16>, 17> blockHorizontal() {
-        for (int i = 0; i < 17; i++) {
-            for (int j = 0; j < 16; j++) {
-                if (horz[i][j] == 2) horz[i][j] = 1;
-            }
-        }
-    }
-    std::array<std::array<int, 17>, 16> blockVertical() {
-        for (int i = 0; i < 16; i++) {
-            for (int j = 0; j < 17; j++) {
-                if (vert[i][j] == 2) vert[i][j] = 1;
-            }
-        }
-    }
+    // std::array<std::array<int, 16>, 17> blockHorizontal() {
+    //     for (int i = 0; i < 17; i++) {
+    //         for (int j = 0; j < 16; j++) {
+    //             if (horz[i][j] == 2) horz[i][j] = 1;
+    //         }
+    //     }
+    // }
+    // std::array<std::array<int, 17>, 16> blockVertical() {
+    //     for (int i = 0; i < 16; i++) {
+    //         for (int j = 0; j < 17; j++) {
+    //             if (vert[i][j] == 2) vert[i][j] = 1;
+    //         }
+    //     }
+    // }
 
     std::array<std::array<int, 16>, 17> getHorizontal() {
         return horz;

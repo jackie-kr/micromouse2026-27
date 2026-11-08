@@ -15,6 +15,10 @@ public:
         return adjList;
     }
 
+    void clear_graph() {
+        adjList.clear();
+    }
+
     // Function to add an edge between vertices u and v of
     // the graph
     void add_edge(int u, int v)

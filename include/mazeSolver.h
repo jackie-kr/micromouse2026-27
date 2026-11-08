@@ -34,7 +34,9 @@ class MazeSolver {
         GraphList createGraph(std::array<std::array<int, 16>, 17> horz,
             std::array<std::array<int, 17>, 16> vert);
 
-        void addEdge(int u, int v);
+        GraphList addEdge(int u, int v);
+
+        GraphList getGraph();
 
         void print();
 

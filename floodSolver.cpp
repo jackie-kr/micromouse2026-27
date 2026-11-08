@@ -7,13 +7,14 @@
 #include <string>
 #include <iostream>
 #include <utility>
+#include <algorithm>
 #include "flood.h"
 #include <vector>
 #include "Sensing/mazeMapper.h"
 #include "Sensing/arrayTranslator.h"
+#include "include/mazeSolver.h"
 using namespace std;
 Flood floodfill;
-MazeSolver solve;
 
 enum Action { FORWARD, LEFT, RIGHT, IDLE, AROUND};
 
@@ -42,7 +43,7 @@ bool atGoal(int row, int col, std::vector<std::pair<int, int>> goals) {
     for (const auto& goal : goals) {
         if (row == goal.first && col == goal.second) {
             at_goal = true;
-            std::cerr << "At goal (" << to_string(goal.second) << ", " << to_string(goal.first) << ").\n";
+            // std::cerr << "At goal (" << to_string(goal.second) << ", " << to_string(goal.first) << ").\n";
             break;
         }
     }
@@ -307,10 +308,13 @@ int translateRotation(int current) {
 
 int main(int argc, char* argv[]) {
     MazeMapper mapper;
+    MazeSolver graphSolver;
+    GraphList mazeGraph;
     log("Running...");
 
-    auto horz = mapper.buildHorizontal({curCol, curRow}, translateRotation(curDir), &solve);
-    auto vert = mapper.buildVertical({curCol, curRow}, translateRotation(curDir));
+    auto horz = mapper.buildHorizontal({curCol, curRow}, translateRotation(curDir), &graphSolver);
+    auto vert = mapper.buildVertical({curCol, curRow}, translateRotation(curDir), &graphSolver);
+    // mazeGraph = graphSolver.createGraph(horz, vert);
 
     while (!mapper.mapCompleted()) {
         // log("New goal found hopefully");
@@ -342,8 +346,31 @@ int main(int argc, char* argv[]) {
                 curDir = (curDir + 2) % 4;
             }
 
-            horz = mapper.buildHorizontal({curCol, curRow}, translateRotation(curDir), &solve);
-            vert = mapper.buildVertical({curCol, curRow}, translateRotation(curDir));
+            horz = mapper.buildHorizontal({curCol, curRow}, translateRotation(curDir), &graphSolver);
+            vert = mapper.buildVertical({curCol, curRow}, translateRotation(curDir), &graphSolver);
+
+            // going from the current robot location, check for any new graph stuff
+//             int curIndex = curCol + (curRow * 16);
+//             vector<int> knownConnections = mazeGraph.getList()[curIndex];
+//             vector<int> directions = {
+//                 max(16, curCol + ((curRow + 1) * 16)), // up
+//                 max(16, curCol + 1 + (curRow * 16)), // right
+//                 max(0, curCol + ((curRow - 1) * 16)), // down
+//                 min(0, curCol - 1 + (curRow * 16))
+//             };
+//
+//             for (int dir : directions) {
+//                 if (std::find(knownConnections.begin(), knownConnections.end(), dir) == knownConnections.end()) {
+//                     // This is currently an unknown edge
+//                 }
+//             }
+
+            // loop over each direction
+
+            // graphSolver.createGraph(horz, vert);
+
+            graphSolver.print();
+            graphSolver.findCenterBFS(curCol, curRow);
 
             // log_maze(horz, vert);
             std::cerr << "Percent Mapped: " << mapper.percentComplete() << "%" << std::endl;
@@ -355,7 +382,12 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    solve.print();
+    graphSolver.print();
+    for (int y = 0; y < 16; y++) {
+        for (int x = 0; x < 16; x++) {
+            API::setText(x, y, std::to_string(x + (y * 16)));
+        }
+    }
 
     return 0;
 }

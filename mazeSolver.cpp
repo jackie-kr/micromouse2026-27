@@ -6,6 +6,9 @@ GraphList MazeSolver::createGraph(std::array<std::array<int, 16>, 17> horz,
     size_t vert_size = vert.size();
     size_t horz_size = horz.size();
 
+    // Reset the graph
+    graphL.clear_graph();
+
     // loop over each node of the graph and check for walls
     // Start at bottom left corner (0, 0) and go to top right corner (15, 15)
     // Based on coordinates used by mms
@@ -42,8 +45,13 @@ GraphList MazeSolver::createGraph(std::array<std::array<int, 16>, 17> horz,
     return graphL;
 }
 
-void MazeSolver::addEdge(int u, int v) {
+GraphList MazeSolver::addEdge(int u, int v) {
     graphL.add_edge_directional(u, v);
+    return graphL;
+}
+
+GraphList MazeSolver::getGraph() {
+    return graphL;
 }
 
 void MazeSolver::print() {
@@ -83,6 +91,17 @@ vector<MazeSolver::DIRECTION> MazeSolver::findCenterBFS(int startX, int startY) 
     std::cerr << "Test!" << std::endl;
     q.push(startPos);
 
+//     bool hasCenter = false;
+//     for (auto a : adjList) {
+//         if (!hasCenter && a.first == 103 || a.first == 104 || a.first == 119 || a.first == 120) {
+//             hasCenter = true;
+//         }
+//     }
+//
+//     if (!hasCenter) {
+//         return constructPath(parent, 0, startX, startY);
+//     }
+
     // BFS loop
     while (!q.empty()) {
         int current = q.front();
@@ -93,7 +112,7 @@ vector<MazeSolver::DIRECTION> MazeSolver::findCenterBFS(int startX, int startY) 
         }
         // iterate over neighbors of current node
         for (const auto& neighbor : adjList.at(current)) {
-            // cerr << "Current: " << current << ", Neighbor: " << neighbor << std::endl;
+            cerr << "Current: " << current << ", Neighbor: " << neighbor << std::endl;
             if (!seen[neighbor]) {
                 seen[neighbor] = true;
                 parent[neighbor] = current;
@@ -103,6 +122,7 @@ vector<MazeSolver::DIRECTION> MazeSolver::findCenterBFS(int startX, int startY) 
     }
 
     // if we reach here, the center wasn't found, return path to 0
+    std::cerr << "Returning path back to center" << std::endl;
     return constructPath(parent, 0, startX, startY); // wasn't found
 }
 
@@ -110,9 +130,13 @@ vector<MazeSolver::DIRECTION> MazeSolver::findCenterBFS(int startX, int startY) 
 vector<MazeSolver::DIRECTION> MazeSolver::constructPath(vector<int>& parent, int start, int startX, int startY) {
     vector<int> path;
     vector<DIRECTION> directions;
-    for (int current = start; current >= 0; current = parent[current])
+    for (int current = start; current >= 0; current = parent[current]) {
+        std::cerr << "Pushing back index: " << current << std::endl;
         path.push_back(current);
+    }
     reverse(path.begin(), path.end());
+    // finished creating a path of indexes
+    std::cerr << "Finished creating a path of indexes" << std::endl;
     pair<int, int> prevCoords = {startX, startY}; // starting position of the mouse
     for (int i = 1; i < path.size(); i++) {
         pair<int, int> coords = convertVertToCoords(path.at(i));
