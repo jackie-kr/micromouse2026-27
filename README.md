@@ -1,7 +1,7 @@
 # micromouse2026-27
 
 
-So basically, {main} contains two arrays, which are horizontal and vertical walls. 0 is no wall and 1 is a wall. Run it after making changes.
+So basically, {Maze_gen} contains two arrays, which are horizontal and vertical walls. 0 is no wall and 1 is a wall. 2 is unknown. Run it after making changes.
 
 Subsequent maze will be in the build folder, called {mazeSim.txt}
 
